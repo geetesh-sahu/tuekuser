@@ -3,7 +3,7 @@ import React from 'react';
 import {w, h, fs} from '../config/index';
 import {colors} from '../constants';
 const OtpField = props => {
-  const {placeholder} = props;
+  const {placeholder,onFocus,maxLength} = props;
   return (
     <View>
       <TextInput
@@ -11,6 +11,8 @@ const OtpField = props => {
         keyboardType="number-pad"
         selectionColor={colors.hex_f66820}
         placeholder={placeholder}
+        onFocus={onFocus}
+        maxLength={maxLength}
       />
     </View>
   );

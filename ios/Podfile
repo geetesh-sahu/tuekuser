@@ -21,6 +21,8 @@ target 'TukeTuke' do
 
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
 
+  pod 'react-native-paystack', :path => '../node_modules/react-native-paystack'
+
   target 'TukeTukeTests' do
     inherit! :complete
     # Pods for testing

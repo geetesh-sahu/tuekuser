@@ -3,9 +3,9 @@ import React from 'react';
 import {colors, images} from '../../constants';
 
 const SplashScreen = ({navigation}) => {
-  setTimeout(() => {
-    navigation.navigate('WelcomeScreen');
-  }, 3000);
+  // setTimeout(() => {
+  //   navigation.navigate('WelcomeScreen');
+  // }, 3000);
 
   return (
     <View style={{flex: 1}}>

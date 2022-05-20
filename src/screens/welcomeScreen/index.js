@@ -51,7 +51,7 @@ const WelcomeScreen = ({navigation}) => {
             {locationIcon ? (
               <Ionicons name="checkbox" size={22} color={colors.hex_f66820} />
             ) : (
-              <MaterialCommunityIcons name="checkbox-blank-outline" size={22} />
+              <Ionicons name="ios-checkbox-sharp" size={22} color='grey' />
             )}
           </TouchableOpacity>
         </View>
@@ -65,17 +65,17 @@ const WelcomeScreen = ({navigation}) => {
         </View>
         <View style={{flex: 4}}>
           <Text style={{fontSize: 16}}>Notifications</Text>
-          <Text
-            style={
-              styles.locationText
-            }>{`Location accuracy allows us to better provide you\nwith more convenient and better services `}</Text>
+          <Text style={styles.locationText}>
+            {' '}
+            {`Location accuracy allows us to better provide you\nwith more convenient and better services `}
+          </Text>
         </View>
         <View style={{marginTop: h(2)}}>
           <TouchableOpacity onPress={changeIconNot}>
-            {notificationIcon ? (-
+            {notificationIcon ? (
               <Ionicons name="checkbox" size={22} color={colors.hex_f66820} />
             ) : (
-              <MaterialCommunityIcons name="checkbox-blank-outline" size={22} />
+              <Ionicons name="ios-checkbox-sharp" size={22} color='grey' />
             )}
           </TouchableOpacity>
         </View>
@@ -92,7 +92,8 @@ const WelcomeScreen = ({navigation}) => {
         <View style={{marginTop: 10}}>
           <CommonBtn
             text="Agree"
-            onPress={() => navigation.navigate('LoginScreen')}
+            onPress={() => navigation.navigate('LoginWithNumber')}
+            customBtnStyle={{padding:12,width:370}}
           />
         </View>
       </View>

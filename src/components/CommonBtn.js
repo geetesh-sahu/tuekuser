@@ -21,12 +21,14 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 8,
     width:320,
-    alignSelf:'center'
+    alignSelf:'center',
+    justifyContent:'center'
   },
   btnText: {
     alignSelf: 'center',
     color: colors.hex_f2f2f2,
     fontWeight: 'bold',
     fontSize: 16,
+    
   },
 });

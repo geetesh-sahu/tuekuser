@@ -1,6 +1,6 @@
 import {Platform} from 'react-native';
 
-export const BASE_URL = '';
+export const BASE_URL = 'http://192.168.0.178:5001/api/';
 
 export const fontfamily = Platform.select({
   android: {
@@ -16,7 +16,11 @@ export const images = {
    commonLogo : require("../assets/images/commonLogo.png"),
    locationLogo: require('../assets/images/locationLogo.png'),
    notificationLogo : require("../assets/images/notificationLogo.png"),
-   appBackgroundImgae:require("../assets/images/bg_shape.png")
+   appBackgroundImgae:require("../assets/images/bg_shape.png"),
+   vehicle_image:require("../assets/images/vehicleImage.png"),
+   clip_board : require("../assets/images/AppIcon98x98.png"),
+   flag_image :require('../assets/images/24x24.png'),
+   coupon_icon :require('../assets/images/coupon_icon.png'), 
 };
 
 export const colors = {
@@ -25,5 +29,6 @@ export const colors = {
   hex_f2f2f2: "#f2f2f2",
   hex_32CD32: '#32CD32',
   hex_D3D3D3: "#D3D3D3",
-  hex_000000: "#000000"
+  hex_000000: "#000000",
+  hex_414042: "#414042",
 };

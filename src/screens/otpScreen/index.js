@@ -1,22 +1,59 @@
 import {StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
-import React, {useState, useEffect} from 'react';
+import React, {useEffect, useState, useContext} from 'react';
 import {colors, images} from '../../constants';
-import CommonInputField from '../../components/CommonInputField';
-import {h, w} from '../../config';
 import CommonBtn from '../../components/CommonBtn';
 import CustomHeader from '../../components/CustomHeader';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import OtpField from '../../components/OtpField';
-const OtpScreen = ({navigation}) => {
-  const [resendOtp, setresendOtp] = useState(true);
 
-  // setTimeout(() => {
-  //   navigation.navigate('VehicleScreen');
-  // }, 3000);
+import {AuthContext} from '../../utils/context';
+import {
+  CodeField,
+  Cursor,
+  useBlurOnFulfill,
+  useClearByFocusCell,
+} from 'react-native-confirmation-code-field';
+
+const CELL_COUNT = 4;
+
+const OtpScreen = ({navigation}) => {
+  const [value, setValue] = useState('');
+  const ref = useBlurOnFulfill({value, cellCount: CELL_COUNT});
+  const [props, getCellOnLayoutHandler] = useClearByFocusCell({
+    value,
+    setValue,
+  });
+  const [resendOtp, setresendOtp] = useState(true);
+  const [timerCount, setTimer] = useState(60);
+  const {signIn} = useContext(AuthContext);
+
+  useEffect(() => {
+    let interval = setInterval(() => {
+      setTimer(lastTimerCount => {
+        lastTimerCount <= 1 && clearInterval(interval);
+        return lastTimerCount - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  var val = Math.floor(1000 + Math.random() * 9000);
+  useEffect(() => {
+    alert(val);
+  }, []);
+
+  const sendOtpHandler = () => {
+    setTimer(60);
+    let interval = setInterval(() => {
+      setTimer(lastTimerCount => {
+        lastTimerCount <= 1 && clearInterval(interval);
+        return lastTimerCount - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  };
 
   return (
     <View style={styles.container}>
-      <CustomHeader onPress={()=> navigation.goBack()} />
+      <CustomHeader onPress={() => navigation.goBack()} />
       <View style={{marginTop: 60}}>
         <View>
           <Image source={images.commonLogo} style={styles.appLogo} />
@@ -28,18 +65,46 @@ const OtpScreen = ({navigation}) => {
           </Text>
         </View>
         <View style={styles.otpView}>
-          <OtpField />
-          <OtpField />
-          <OtpField />
-          <OtpField />
+          <CodeField
+            ref={ref}
+            {...props}
+            value={value}
+            onChangeText={i => {
+              setValue(i);
+              const res = {
+                data: {
+                  token: '00000',
+                },
+              };
+              if (i.length == 4) {
+                signIn(res);
+              }
+            }}
+            cellCount={CELL_COUNT}
+            rootStyle={styles.codeFieldRoot}
+            keyboardType="number-pad"
+            textContentType="oneTimeCode"
+            renderCell={({index, symbol, isFocused}) => (
+              <Text
+                key={index}
+                style={[
+                  styles.cell,
+                  isFocused && styles.focusCell,
+                  {marginHorizontal: 5,borderRadius:8,backgroundColor:'white',borderWidth:0},
+                ]}
+                onLayout={getCellOnLayoutHandler(index)}>
+                {symbol || (isFocused ? <Cursor /> : null)}
+              </Text>
+            )}
+          />
         </View>
       </View>
-      {resendOtp ? (
+      {resendOtp && timerCount ? (
         <Text style={styles.sendOtp}>
-          {`We will resend you verification code in (59)\nseconds`}
+          {`We will resend you verification code in ${timerCount}\nseconds`}
         </Text>
       ) : (
-        <TouchableOpacity>
+        <TouchableOpacity onPress={sendOtpHandler}>
           <Text style={[styles.sendOtp, {color: 'red'}]}>Resend</Text>
         </TouchableOpacity>
       )}
@@ -84,5 +149,22 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
     width: 300,
     alignSelf: 'center',
+  },
+  root: {flex: 1, padding: 20},
+  title: {textAlign: 'center', fontSize: 30},
+  codeFieldRoot: {marginTop: 20},
+  cell: {
+    width: 50,
+    height: 50,
+    lineHeight: 48,
+    fontSize: 24,
+    borderWidth: 1,
+    borderColor: '#00000030',
+    textAlign: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  focusCell: {
+    borderColor: '#000',
   },
 });
