@@ -10,7 +10,7 @@ import {images} from '../../constants';
 import Geolocation from 'react-native-geolocation-service';
 import Geocoder from 'react-native-geocoding';
 import {DESTINATIONlOCATION, LOCATION} from '../../redux/constants/type';
-
+import {showMessage, hideMessage} from 'react-native-flash-message';
 
 Geocoder.init('AIzaSyBzhsIqqHLkDrRiSqt94pxHJCdHHXgA464');
 const PickupLocation = props => {
@@ -32,8 +32,8 @@ const PickupLocation = props => {
           console.log(position);
           Geocoder.from(position.coords.latitude, position.coords.longitude)
             .then(json => {
-              const addressComponent = json.results[0].address_components;
-              const addresCurrent = addressComponent[1].long_name;
+               const addressComponent = json.results[0].address_components;
+               const addresCurrent = addressComponent[1].long_name;
               setaddress({
                 Address: addresCurrent,
                 latitude: position.coords.latitude,
@@ -52,18 +52,24 @@ const PickupLocation = props => {
   }, []);
 
   const locationHandler = (data, details) => {
-    dispatch({type:DESTINATIONlOCATION, payload:details.geometry.location })
-    console.log('gghh', details.geometry.location);
-    props.navigation.navigate('CurrentLocation', {
-      data: data,
-      detail: details,
+    console.log('details====>>>>', details.address_components[0].long_name);
+    const formatAddress = details.formatted_address;
+    const destinationLocation = details.address_components[0].long_name;
+    dispatch({
+      type: DESTINATIONlOCATION,
+      payload: {cityName: destinationLocation, fullAddress: formatAddress},
     });
+    props.navigation.navigate('CurrentLocation');
   };
 
   const userCurrentLocation = () => {
+    showMessage({
+      message: 'Simple message',
+      type: 'info',
+    });
     dispatch({type: LOCATION, payload: address});
-   props.navigation.navigate('CurrentLocation')
-  }
+    props.navigation.navigate('CurrentLocation');
+  };
 
   return (
     <View style={styles.container}>

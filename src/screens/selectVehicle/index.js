@@ -50,10 +50,10 @@ const SelectVehicle = ({navigation}) => {
       <CustomHeader onPress={() => navigation.goBack()} text="Select vehicle" showLine={true} />
       <ScrollView>
       <VehicleSelection
-        customImageStyle={styles.imageView}
+       
         data = {vehicle}
-        vehicledetail={{marginLeft:w(1)}}
-        vehicleContianer = {{marginLeft:w(37),}}
+        
+        
       />
       <View
         style={[
