@@ -51,7 +51,7 @@ const CurrentLocation = ({navigation}) => {
   const vehicleList = () => {
     dispatch(loader(true));
     axios
-      .get('http://192.168.0.178:5001/api/VehicleList/VehicleList')
+      .get('http://tuketuke.azurewebsites.net/api/VehicleList/VehicleList')
       .then(function (response) {
         dispatch(loader(false));
         setvehicle(response.data.data);

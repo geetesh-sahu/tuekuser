@@ -6,9 +6,9 @@ import {
   TouchableOpacity,
   Image,
   TextInput,
-  ScrollView
+  ScrollView,
 } from 'react-native';
-import React,{useState,useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import CustomHeader from '../../components/CustomHeader';
 import {fs, h, w} from '../../config';
 import VehicleSelection from '../../components/VehicleSelection';
@@ -16,24 +16,23 @@ import Ionicons from 'react-native-vector-icons/dist/Ionicons';
 import AntDesign from 'react-native-vector-icons/dist/AntDesign';
 import CommonBtn from '../../components/CommonBtn';
 import {images} from '../../constants';
-import { loader } from '../../redux/actions/loader';
-import { useDispatch } from 'react-redux';
+import {loader} from '../../redux/actions/loader';
+import {useDispatch} from 'react-redux';
 import axios from 'axios';
-
 
 const SelectVehicle = ({navigation}) => {
   const [vehicle, setvehicle] = useState('');
 
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    vehicleList();
-  }, []);
+  // useEffect(() => {
+  //   vehicleList();
+  // }, []);
 
   const vehicleList = () => {
     dispatch(loader(true));
     axios
-      .get('http://192.168.0.178:5001/api/VehicleList/VehicleList')
+      .get('http://tuketuke.azurewebsites.net/api/VehicleList/VehicleList')
       .then(function (response) {
         dispatch(loader(false));
         setvehicle(response.data.data);
@@ -46,116 +45,110 @@ const SelectVehicle = ({navigation}) => {
   };
   return (
     <SafeAreaView style={{flex: 1}}>
-
-      <CustomHeader onPress={() => navigation.goBack()} text="Select vehicle" showLine={true} />
+      <CustomHeader
+        onPress={() => navigation.goBack()}
+        text="Select vehicle"
+        showLine={true}
+      />
       <ScrollView>
-      <VehicleSelection
-       
-        data = {vehicle}
-        
-        
-      />
-      <View
-        style={[
-          styles.horizontalLine,
-          {marginTop: h(1), borderBottomWidth: w(1)},
-        ]}
-      />
-      <View style={styles.container}>
-        <View style={{alignItems: 'center'}}>
-          <Ionicons name="ios-location-outline" size={22} color="green" />
-          <View style={styles.verticleLine} />
-          <Image source={images.flag_image} style={{marginLeft: w(3)}} />
-        </View>
-        <View style={styles.locationArea}>
-          <View style={styles.horizontal}>
-            <Text style={styles.placeName}>Eko International Hotel</Text>
-            <TouchableOpacity>
+        <VehicleSelection data={vehicle} />
+        <View
+          style={[
+            styles.horizontalLine,
+            {marginTop: h(1), borderBottomWidth: w(1)},
+          ]}
+        />
+        <View style={styles.container}>
+          <View style={{alignItems: 'center'}}>
+            <Ionicons name="ios-location-outline" size={22} color="green" />
+            <View style={styles.verticleLine} />
+            <Image source={images.flag_image} style={{marginLeft: w(3)}} />
+          </View>
+          <View style={styles.locationArea}>
+            <TouchableOpacity style={styles.horizontal}>
+              <Text style={styles.placeName}>Eko International Hotel</Text>
               <Ionicons name="chevron-forward" size={26} color="grey" />
             </TouchableOpacity>
-          </View>
-          <View style={[styles.horizontalLine, {marginVertical: h(2)}]} />
-          <View style={styles.horizontal}>
-            <Text style={styles.placeName}>Tantalizer Restaurant</Text>
-            <TouchableOpacity>
+            <View style={[styles.horizontalLine, {marginVertical: h(2)}]} />
+            <TouchableOpacity style={styles.horizontal}>
+              <Text style={styles.placeName}>Tantalizer Restaurant</Text>
               <Ionicons name="chevron-forward" size={26} color="grey" />
             </TouchableOpacity>
           </View>
         </View>
-      </View>
-      <View
-        style={[
-          styles.horizontalLine,
-          {marginTop: h(1), borderBottomWidth: w(3)},
-        ]}
-      />
-      <View style={styles.horizontalBox}>
-        <Text style={{marginLeft: w(4)}}>08066845214</Text>
-        <View style={styles.textWithIcon}>
-          <Text style={{fontSize: fs(10)}}>Select from contact</Text>
-          <TouchableOpacity>
-            <Ionicons name="chevron-forward" size={30} color="grey" />
-          </TouchableOpacity>
+        <View
+          style={[
+            styles.horizontalLine,
+            {marginTop: h(1), borderBottomWidth: w(3)},
+          ]}
+        />
+        <View style={styles.horizontalBox}>
+          <Text style={{marginLeft: w(4)}}>08066845214</Text>
+          <View style={styles.textWithIcon}>
+            <Text style={{fontSize: fs(10)}}>Select from contact</Text>
+            <TouchableOpacity>
+              <Ionicons name="chevron-forward" size={30} color="grey" />
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-      <View style={[styles.horizontalLine]} />
-      <View style={styles.horizontalBox}>
-        <View style={styles.textWithIcon}>
+        <View style={[styles.horizontalLine]} />
+        <View style={styles.horizontalBox}>
+          <View style={styles.textWithIcon}>
+            <AntDesign name="user" size={25} />
+            <TextInput
+              placeholder={`Reciever's Number`}
+              placeholderTextColor="lightgrey"
+              style={{paddingLeft: 12}}
+            />
+          </View>
+          <View style={styles.textWithIcon}>
+            <Text style={{fontSize: fs(10)}}>Select from contact</Text>
+            <TouchableOpacity>
+              <Ionicons name="chevron-forward" size={30} color="grey" />
+            </TouchableOpacity>
+          </View>
+        </View>
+        <View style={[styles.horizontalLine]} />
+        <View style={styles.NameInput}>
           <AntDesign name="user" size={25} />
           <TextInput
-            placeholder={`Reciever's Number`}
-            placeholderTextColor="lightgrey"
+            placeholder="Name"
+            placeholderTextColor={'lightgrey'}
             style={{paddingLeft: 12}}
           />
         </View>
-        <View style={styles.textWithIcon}>
-          <Text style={{fontSize: fs(10)}}>Select from contact</Text>
-          <TouchableOpacity>
-            <Ionicons name="chevron-forward" size={30} color="grey" />
-          </TouchableOpacity>
+        <View style={[styles.horizontalLine, {borderBottomWidth: h(2)}]} />
+        <View style={styles.horizontalBox}>
+          <Text style={{marginLeft: w(4)}}>Pick up time</Text>
+          <View style={styles.textWithIcon}>
+            <Text style={styles.footerText}>Now</Text>
+            <TouchableOpacity>
+              <Ionicons name="chevron-forward" size={26} color="grey" />
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-      <View style={[styles.horizontalLine]} />
-      <View style={styles.NameInput}>
-        <AntDesign name="user" size={25} />
-        <TextInput
-          placeholder="Name"
-          placeholderTextColor={'lightgrey'}
-          style={{paddingLeft: 12}}
-        />
-      </View>
-      <View style={[styles.horizontalLine, {borderBottomWidth: h(2)}]} />
-      <View style={styles.horizontalBox}>
-        <Text style={{marginLeft: w(4)}}>Pick up time</Text>
-        <View style={styles.textWithIcon}>
-          <Text style={styles.footerText}>Now</Text>
-          <TouchableOpacity>
-            <Ionicons name="chevron-forward" size={26} color="grey" />
-          </TouchableOpacity>
+        <View style={[styles.horizontalLine]} />
+        <View style={styles.horizontalBox}>
+          <Text style={{marginLeft: w(4)}}>Payment method</Text>
+          <View style={styles.textWithIcon}>
+            <Text style={styles.footerText}>Wallet</Text>
+            <TouchableOpacity>
+              <Ionicons name="chevron-forward" size={26} color="grey" />
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-      <View style={[styles.horizontalLine]} />
-      <View style={styles.horizontalBox}>
-        <Text style={{marginLeft: w(4)}}>Payment method</Text>
-        <View style={styles.textWithIcon}>
-          <Text style={styles.footerText}>Wallet</Text>
-          <TouchableOpacity>
-            <Ionicons name="chevron-forward" size={26} color="grey" />
-          </TouchableOpacity>
+        <View style={[styles.horizontalLine]} />
+        <View style={styles.numberBox}>
+          <Text style={{}}>Estimated cost</Text>
+          <Text style={styles.number}> N4,000</Text>
         </View>
-      </View>
-      <View style={[styles.horizontalLine]} />
-      <View style={styles.numberBox}>
-        <Text style={{}}>Estimated cost</Text>
-        <Text style={styles.number}> N4,000</Text>
-      </View>
-      <View style={styles.confirmBtnView}>
-        <CommonBtn
-          text="Confirm"
-          customBtnStyle={styles.confirmBtn}
-          onPress={() => navigation.navigate('Payment')}
-        />
-      </View>
+        <View style={styles.confirmBtnView}>
+          <CommonBtn
+            text="Confirm"
+            customBtnStyle={styles.confirmBtn}
+            onPress={() => navigation.navigate('Payment')}
+          />
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
