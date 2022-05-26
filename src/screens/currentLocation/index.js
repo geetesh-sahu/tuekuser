@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   FlatList,
   Image,
-  ScrollView
+  ScrollView,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import Ionicons from 'react-native-vector-icons/dist/Ionicons';
@@ -21,7 +21,6 @@ import VehicleSelection from '../../components/VehicleSelection';
 import axios from 'axios';
 import {useDispatch, useSelector} from 'react-redux';
 import {loader} from '../../redux/actions/loader';
-
 
 const DATA = [
   {
@@ -70,7 +69,10 @@ const CurrentLocation = ({navigation}) => {
   // };
 
   const nextHandler = () => {
-    navigation.navigate('SelectVehicle');
+    navigation.navigate('SelectVehicle', {
+      currentL: getLocation,
+      destionationL: getdestinationLocation,
+    });
   };
 
   const getLocation = useSelector(state => state.locationReducer.data);
@@ -78,8 +80,6 @@ const CurrentLocation = ({navigation}) => {
   const getdestinationLocation = useSelector(
     state => state.destinationLocationReducer.data,
   );
-
- 
 
   const handlerOpacity = item => {
     setisIMageOpacity(item);
@@ -92,110 +92,117 @@ const CurrentLocation = ({navigation}) => {
         backgroundColor: opacity ? 'black' : 'lightgrey',
         opacity: opacity ? 0.5 : 1,
       }}>
-        <ScrollView>
-      <View style={styles.container1}>
-        <View style={styles.cityName}>
-          <Ionicons name="location-sharp" size={22} color="grey" />
-          <Text>New York City</Text>
-        </View>
-        <View>
-          <TouchableOpacity style={styles.menuIconView}>
-            <View style={styles.square} />
-            <View style={[styles.square, {marginHorizontal: h(0.7)}]} />
-            <View style={styles.square} />
-          </TouchableOpacity>
-        </View>
-      </View>
-      <View style={styles.container2}>
-        <View style={styles.locatinDetail}>
-          <Text>Pick up time </Text>
-          <View style={styles.horizontalView}>
-            <Text style={styles.nowText}>Now</Text>
-            <TouchableOpacity>
-              <Ionicons name="chevron-forward" size={26} color="grey" />
+      <ScrollView>
+        <View style={styles.container1}>
+          <View style={styles.cityName}>
+            <Ionicons name="location-sharp" size={22} color="grey" />
+            <Text>New York City</Text>
+          </View>
+          <View>
+            <TouchableOpacity style={styles.menuIconView}>
+              <View style={styles.square} />
+              <View style={[styles.square, {marginHorizontal: h(0.7)}]} />
+              <View style={styles.square} />
             </TouchableOpacity>
           </View>
         </View>
-        <View
-          style={{
-            borderBottomColor: 'lightgrey',
-            borderBottomWidth: 2,
-          }}
-        />
-
-        <TouchableOpacity
-          onPress={() => navigation.navigate('PickupLocation')}
-          style={{
-            flexDirection: 'row',
-            padding: w(5),
-            justifyContent: 'space-between',
-          }}>
-          <Ionicons name="ios-location-outline" size={22} color="grey" />
-          <View style={styles.location}>
-            <View style={{marginRight: w(2)}}>
-              <Text>Current pick up location</Text>
-              <Text style={styles.placeName}>{getLocation.Address}</Text>
-              <Text>{`Block A, Rm 2512 Pack view Avenue, Victorial\nIsland, Lagos.`}</Text>
+        <View style={styles.container2}>
+          <View style={styles.locatinDetail}>
+            <Text>Pick up time </Text>
+            <View style={styles.horizontalView}>
+              <Text style={styles.nowText}>Now</Text>
+              <TouchableOpacity>
+                <Ionicons name="chevron-forward" size={26} color="grey" />
+              </TouchableOpacity>
             </View>
-            <TouchableOpacity>
-              <Ionicons name="chevron-forward" size={26} color="grey" />
-            </TouchableOpacity>
           </View>
-        </TouchableOpacity>
-        <View style={styles.refreshView}>
-          <View style={styles.length} />
-          <View style={{transform: [{rotate: '40deg'}]}}>
-            <MaterialCommunityIcons name="sync" size={30} color="black" />
-          </View>
-          <View style={styles.length} />
-        </View>
+          <View
+            style={{
+              borderBottomColor: 'lightgrey',
+              borderBottomWidth: 2,
+            }}
+          />
 
-       {getdestinationLocation =="" ? <CommonInputField
-          onFocus = {() => navigation.navigate('PickupLocation') }
-          placeholder="Enter destination address"
-          inputStyle={styles.inputView}
-        /> :  <View
-        style={{
-          flexDirection: 'row',
-          padding: w(5),
-          justifyContent: 'space-between',
-        }}>
-        <Image source={images.flag_image} style={{marginLeft: w(2)}} />
-        <TouchableOpacity
-          style={styles.location}
-          onPress={() => navigation.navigate('PickupLocation')}>
-          <View style={{marginRight: w(2),width:w(67)}}>
-            <Text>Current pick up location</Text>
-            <Text style={styles.placeName}>{getdestinationLocation.cityName}</Text>
-            <Text >{getdestinationLocation.fullAddress}</Text>
-          </View>
-          <TouchableOpacity>
-            <Ionicons name="chevron-forward" size={26} color="grey" />
+          <TouchableOpacity
+            onPress={() => navigation.navigate('PickupLocation')}
+            style={{
+              flexDirection: 'row',
+              padding: w(5),
+              justifyContent: 'space-between',
+            }}>
+            <Ionicons name="ios-location-outline" size={22} color="grey" />
+            <View style={styles.location}>
+              <View style={{marginRight: w(2)}}>
+                <Text>Current pick up location</Text>
+                <Text style={styles.placeName}>{getLocation.Address}</Text>
+                <Text>{`Block A, Rm 2512 Pack view Avenue, Victorial\nIsland, Lagos.`}</Text>
+              </View>
+              <TouchableOpacity>
+                <Ionicons name="chevron-forward" size={26} color="grey" />
+              </TouchableOpacity>
+            </View>
           </TouchableOpacity>
-        </TouchableOpacity>
-      </View> }
-        
+          <View style={styles.refreshView}>
+            <View style={styles.length} />
+            <View style={{transform: [{rotate: '40deg'}]}}>
+              <MaterialCommunityIcons name="sync" size={30} color="black" />
+            </View>
+            <View style={styles.length} />
+          </View>
 
-        <Text style={styles.slide}>Slide to select vehicle</Text>
-        <VehicleSelection
-          data={vehicle}
-          vehicleContianer={{opacity: isIMageOpacity ? 0.5 : 1}}
-          opacityCallback={handlerOpacity}
-        />
-        {isModal && <CommonModal showModal={isModal} navigation={navigation} />}
-        <View style={styles.confirmBtnView}>
-          {/* <CommonBtn
+          {getdestinationLocation == '' ? (
+            <CommonInputField
+              onFocus={() => navigation.navigate('PickupLocation')}
+              placeholder="Enter destination address"
+              inputStyle={styles.inputView}
+            />
+          ) : (
+            <View
+              style={{
+                flexDirection: 'row',
+                padding: w(5),
+                justifyContent: 'space-between',
+              }}>
+              <Image source={images.flag_image} style={{marginLeft: w(2)}} />
+              <TouchableOpacity
+                style={styles.location}
+                onPress={() => navigation.navigate('PickupLocation')}>
+                <View style={{marginRight: w(2), width: w(67)}}>
+                  <Text>Destination address</Text>
+                  <Text style={styles.placeName}>
+                    {getdestinationLocation.cityName}
+                  </Text>
+                  <Text>{getdestinationLocation.fullAddress}</Text>
+                </View>
+                <TouchableOpacity>
+                  <Ionicons name="chevron-forward" size={26} color="grey" />
+                </TouchableOpacity>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          <Text style={styles.slide}>Slide to select vehicle</Text>
+          <VehicleSelection
+            data={vehicle}
+            vehicleContianer={{opacity: isIMageOpacity ? 0.5 : 1}}
+            opacityCallback={handlerOpacity}
+          />
+          {isModal && (
+            <CommonModal showModal={isModal} navigation={navigation} />
+          )}
+          <View style={styles.confirmBtnView}>
+            {/* <CommonBtn
             text="Confirm"
             customBtnStyle={styles.confirmBtn}
             onPress={modalHandler}
           /> */}
-          <CommonBtn
-            text="Next"
-            customBtnStyle={styles.confirmBtn}
-            onPress={nextHandler}
-          />
+            <CommonBtn
+              text="Next"
+              customBtnStyle={styles.confirmBtn}
+              onPress={nextHandler}
+            />
+          </View>
         </View>
-      </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -299,9 +306,6 @@ const styles = StyleSheet.create({
   },
 });
 
-
-
-
 // import { StyleSheet, Text, View } from 'react-native'
 // import React from 'react'
 // import Swiper from 'react-native-swiper'
@@ -327,19 +331,19 @@ const styles = StyleSheet.create({
 // const styles = StyleSheet.create({
 //   wrapper: {},
 //   slide1: {
-//    
+//
 //     justifyContent: 'center',
 //     alignItems: 'center',
 //     backgroundColor: '#9DD6EB'
 //   },
 //   slide2: {
-//    
+//
 //     justifyContent: 'center',
 //     alignItems: 'center',
 //     backgroundColor: '#97CAE5'
 //   },
 //   slide3: {
-//  
+//
 //     justifyContent: 'center',
 //     alignItems: 'center',
 //     backgroundColor: '#92BBD9'
@@ -350,18 +354,16 @@ const styles = StyleSheet.create({
 //     fontWeight: 'bold'
 //   }
 // })
-
-
 
 // import React, { Component } from 'react'
 // import { AppRegistry, StyleSheet, Text, View } from 'react-native'
- 
+
 // import Swiper from 'react-native-swiper'
- 
+
 // const styles = StyleSheet.create({
 //   wrapper: {},
 //   slide1: {
-   
+
 //     justifyContent: 'center',
 //     alignItems: 'center',
 //     backgroundColor: '#9DD6EB'
@@ -384,7 +386,7 @@ const styles = StyleSheet.create({
 //     fontWeight: 'bold'
 //   }
 // })
- 
+
 // export default class CurrnetLocation extends Component {
 //   render() {
 //     return (

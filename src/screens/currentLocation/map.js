@@ -1,15 +1,18 @@
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import React,{useState,useRef} from 'react';
+import React,{useState,useRef,useEffect} from 'react';
 import MapView, {Marker} from 'react-native-maps';
-import {fs, h, w} from '../../config';
+import {fs, h, height, w} from '../../config';
 import CustomHeader from '../../components/CustomHeader';
 import MapViewDirections from 'react-native-maps-directions';
+import { colors, } from '../../constants';
+import { useSelector } from 'react-redux';
+
 
 const Map = ({navigation}) => {
   const [mapLocation, setmapLocation] = useState({
     pickupcords: {
-      latitude: 22.7244,
-      longitude: 75.8839,
+      latitude: 12.971940,
+      longitude: 77.532745,
       latitudeDelta: 0.015,
       longitudeDelta: 0.0121,
     },
@@ -21,39 +24,64 @@ const Map = ({navigation}) => {
     },
   });
 
+  // useEffect(() => {
+  //   setmapLocation({
+  //     pickupcords: {
+  //       latitude : currentLocationLatitude,
+  //       longitude : currentLocationLongitude,
+  //       latitudeDelta: 0.015,
+  //       longitudeDelta: 0.0121,
+  //     },
+  //     droplocationcords: {
+  //       latitude: destinationLocationLatitue,
+  //       longitude: destinationLocationLongitude,
+  //       latitudeDelta: 0.015,
+  //       longitudeDelta: 0.0121,
+  //     },
+  //   })
+  // }, [])
+  
+
+  const currentLocationLatitude = useSelector(state=>  state.locationReducer.data.latitude)
+  const currentLocationLongitude = useSelector(state=>  state.locationReducer.data.longitude)
+  
+  const destinationLocationLatitue = useSelector(state=> state.destinationLocationReducer.data.latitude)
+  const destinationLocationLongitude = useSelector(state=> state.destinationLocationReducer.data.longitude)
+
   const mapRef = useRef();
   const {pickupcords, droplocationcords} = mapLocation;
   return (
     <View style={{flex: 1}}>
       <CustomHeader onPress={() => navigation.goBack()} text="Confirmation" />
-
+      <View style={{height:h(70)}}>
       <MapView
       // provider='AIzaSyBzhsIqqHLkDrRiSqt94pxHJCdHHXgA464' // remove if not using Google Maps
       ref={mapRef}
-      style={styles.map}
+       style={styles.map}
       region={pickupcords}>
-      <Marker coordinate={pickupcords} />
-      <Marker coordinate={droplocationcords} />
+      <Marker coordinate={pickupcords}  />
+      {/* <Marker coordinate={droplocationcords}   /> */}
       <MapViewDirections
         origin={pickupcords}
-        // destination={droplocationcords}
+         destination={droplocationcords}
         apikey={'AIzaSyBzhsIqqHLkDrRiSqt94pxHJCdHHXgA464'}
        
-        // strokeWidth={8}
-        // strokeColor="red"
-        // optimizeWaypoints={true}
-        // onReady={result => {
-        //   mapRef.current.fitToCoordinates(result.coordinate, {
-        //     edgePadding: {
-        //       right: 30,
-        //       bottom: 300,
-        //       left: 30,
-        //       top: 100,
-        //     },
-        //   });
-        // }}
+         strokeWidth={7}
+         strokeColor={'blue'}
+        optimizeWaypoints={true}
+        onReady={result => {
+          mapRef.current.fitToCoordinates(result.coordinate, {
+            edgePadding: {
+              right: 530,
+              bottom: 300,
+              left: 530,
+              top: 500,
+            },
+          });
+        }}
       />
     </MapView>
+    </View>
       <View
         style={{
           justifyContent: 'space-between',
@@ -77,7 +105,7 @@ export default Map;
 const styles = StyleSheet.create({
   map: {
     width: '100%',
-    height: '70%',
+    height: '95%',
     marginTop: h(2),
   },
   header: {
@@ -86,34 +114,3 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
 });
-
-// import { StyleSheet, Text, View } from 'react-native'
-// import React from 'react'
-// import MapView, {PROVIDER_GOOGLE} from 'react-native-maps';
-
-// const Map = () => {
-//   return (
-//     <View>
-//        <MapView
-
-//        style={styles.map}
-//        region={{
-//          latitude: 37.78825,
-//          longitude: -122.4324,
-//          latitudeDelta: 0.015,
-//          longitudeDelta: 0.0121,
-//        }}
-//      >
-//      </MapView>
-// </View>
-//   )
-// }
-
-// export default Map
-
-// const styles = StyleSheet.create({
-//   map:{
-//    width:'100%',
-//    height:'90%'
-//   }
-// })

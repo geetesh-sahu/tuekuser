@@ -20,14 +20,18 @@ import {loader} from '../../redux/actions/loader';
 import {useDispatch} from 'react-redux';
 import axios from 'axios';
 
-const SelectVehicle = ({navigation}) => {
+const SelectVehicle = (props) => {
+  console.log('props===>>>',props.route.params.destionationL.cityName)
   const [vehicle, setvehicle] = useState('');
+
+  const currentL  = props.route.params.currentL.Address
+  const destinationL = props.route.params.destionationL.cityName
 
   const dispatch = useDispatch();
 
-  // useEffect(() => {
-  //   vehicleList();
-  // }, []);
+  useEffect(() => {
+    vehicleList();
+  }, []);
 
   const vehicleList = () => {
     dispatch(loader(true));
@@ -46,12 +50,16 @@ const SelectVehicle = ({navigation}) => {
   return (
     <SafeAreaView style={{flex: 1}}>
       <CustomHeader
-        onPress={() => navigation.goBack()}
+        onPress={() => props.navigation.goBack()}
         text="Select vehicle"
         showLine={true}
       />
       <ScrollView>
-        <VehicleSelection data={vehicle} />
+      <VehicleSelection
+            data={vehicle}
+            // vehicleContianer={{opacity: isIMageOpacity ? 0.5 : 1}}
+            // opacityCallback={handlerOpacity}
+          />
         <View
           style={[
             styles.horizontalLine,
@@ -66,12 +74,12 @@ const SelectVehicle = ({navigation}) => {
           </View>
           <View style={styles.locationArea}>
             <TouchableOpacity style={styles.horizontal}>
-              <Text style={styles.placeName}>Eko International Hotel</Text>
+              <Text style={styles.placeName}>{currentL}</Text>
               <Ionicons name="chevron-forward" size={26} color="grey" />
             </TouchableOpacity>
             <View style={[styles.horizontalLine, {marginVertical: h(2)}]} />
             <TouchableOpacity style={styles.horizontal}>
-              <Text style={styles.placeName}>Tantalizer Restaurant</Text>
+              <Text style={styles.placeName}>{destinationL}</Text>
               <Ionicons name="chevron-forward" size={26} color="grey" />
             </TouchableOpacity>
           </View>
@@ -146,7 +154,7 @@ const SelectVehicle = ({navigation}) => {
           <CommonBtn
             text="Confirm"
             customBtnStyle={styles.confirmBtn}
-            onPress={() => navigation.navigate('Payment')}
+            onPress={() => props.navigation.navigate('Payment')}
           />
         </View>
       </ScrollView>

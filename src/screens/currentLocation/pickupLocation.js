@@ -52,12 +52,15 @@ const PickupLocation = props => {
   }, []);
 
   const locationHandler = (data, details) => {
-    console.log('details====>>>>', details.address_components[0].long_name);
+    console.log('details====>>>>', details.geometry.location);
+
+    const lat = details.geometry.location.lat
+    const lng = details.geometry.location.lng
     const formatAddress = details.formatted_address;
     const destinationLocation = details.address_components[0].long_name;
     dispatch({
       type: DESTINATIONlOCATION,
-      payload: {cityName: destinationLocation, fullAddress: formatAddress},
+      payload: {cityName: destinationLocation, fullAddress: formatAddress,latitude:lat,longitude:lng  },
     });
     props.navigation.navigate('CurrentLocation');
   };
@@ -118,6 +121,7 @@ const PickupLocation = props => {
                 marginLeft: w(-1),
               }}>
               <GooglePlacesAutocomplete
+              placeholder='Enter your address'
                 fetchDetails={true}
                 query={{
                   key: 'AIzaSyBzhsIqqHLkDrRiSqt94pxHJCdHHXgA464',
