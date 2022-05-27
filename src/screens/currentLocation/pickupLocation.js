@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
+import {StyleSheet, Text, View, Image, TouchableOpacity,SafeAreaView} from 'react-native';
 import {useDispatch} from 'react-redux';
 import CustomHeader from '../../components/CustomHeader';
 import {fs, h, w} from '../../config';
@@ -75,7 +75,7 @@ const PickupLocation = props => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <CustomHeader
         onPress={() => props.navigation.goBack()}
         text="Pickup location"
@@ -155,7 +155,7 @@ const PickupLocation = props => {
           </View>
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 

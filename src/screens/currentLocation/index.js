@@ -47,7 +47,7 @@ const CurrentLocation = ({navigation}) => {
     vehicleList();
   }, []);
 
-  const vehicleList = () => {
+  const vehicleList = async () => {
     dispatch(loader(true));
     axios
       .get('http://tuketuke.azurewebsites.net/api/VehicleList/VehicleList')
@@ -132,7 +132,7 @@ const CurrentLocation = ({navigation}) => {
             }}>
             <Ionicons name="ios-location-outline" size={22} color="grey" />
             <View style={styles.location}>
-              <View style={{marginRight: w(2)}}>
+              <View style={{marginRight: w(2), width: w(67)}}>
                 <Text>Current pick up location</Text>
                 <Text style={styles.placeName}>{getLocation.Address}</Text>
                 <Text>{`Block A, Rm 2512 Pack view Avenue, Victorial\nIsland, Lagos.`}</Text>

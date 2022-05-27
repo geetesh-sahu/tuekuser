@@ -2,7 +2,7 @@ import React from 'react';
 import  { Paystack }  from 'react-native-paystack-webview';
 import { View } from 'react-native';
 
-function PayStack(props) {
+function PayStack({navigation}) {
   return (
     <View style={{ flex: 1 }}>
       <Paystack  
@@ -13,11 +13,13 @@ function PayStack(props) {
         activityIndicatorColor="green"
         onCancel={(e) => {
             console.log('e----->>',e)
-            props.navigation.navigate("Payment")
+            // props.navigation.navigate("PickupLocation")
         }}
         onSuccess={(res) => {
           console.log('res----->>>',res)
-          props.navigation.navigate("Payment")
+          // props.navigation.navigate("PickupLocation")
+          // navigation.goBack(null)
+         
         }}
         autoStart={true}
       />

@@ -1,4 +1,4 @@
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {StyleSheet, Text, TouchableOpacity, View,SafeAreaView} from 'react-native';
 import React,{useState,useRef,useEffect} from 'react';
 import MapView, {Marker} from 'react-native-maps';
 import {fs, h, height, w} from '../../config';
@@ -51,7 +51,7 @@ const Map = ({navigation}) => {
   const mapRef = useRef();
   const {pickupcords, droplocationcords} = mapLocation;
   return (
-    <View style={{flex: 1}}>
+    <SafeAreaView style={{flex: 1}}>
       <CustomHeader onPress={() => navigation.goBack()} text="Confirmation" />
       <View style={{height:h(70)}}>
       <MapView
@@ -96,7 +96,7 @@ const Map = ({navigation}) => {
           </Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 

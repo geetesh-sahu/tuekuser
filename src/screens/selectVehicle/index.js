@@ -20,12 +20,12 @@ import {loader} from '../../redux/actions/loader';
 import {useDispatch} from 'react-redux';
 import axios from 'axios';
 
-const SelectVehicle = (props) => {
-  console.log('props===>>>',props.route.params.destionationL.cityName)
+const SelectVehicle = props => {
+  console.log('props===>>>', props.route.params.destionationL.cityName);
   const [vehicle, setvehicle] = useState('');
 
-  const currentL  = props.route.params.currentL.Address
-  const destinationL = props.route.params.destionationL.cityName
+  const currentL = props.route.params.currentL.Address;
+  const destinationL = props.route.params.destionationL.cityName;
 
   const dispatch = useDispatch();
 
@@ -33,10 +33,10 @@ const SelectVehicle = (props) => {
     vehicleList();
   }, []);
 
-  const vehicleList = () => {
+  const vehicleList =async () => {
+    console.log('async');
     dispatch(loader(true));
-    axios
-      .get('http://tuketuke.azurewebsites.net/api/VehicleList/VehicleList')
+    axios.get('http://tuketuke.azurewebsites.net/api/VehicleList/VehicleList')
       .then(function (response) {
         dispatch(loader(false));
         setvehicle(response.data.data);
@@ -46,6 +46,7 @@ const SelectVehicle = (props) => {
 
         dispatch(loader(false));
       });
+   
   };
   return (
     <SafeAreaView style={{flex: 1}}>
@@ -55,11 +56,11 @@ const SelectVehicle = (props) => {
         showLine={true}
       />
       <ScrollView>
-      <VehicleSelection
-            data={vehicle}
-            // vehicleContianer={{opacity: isIMageOpacity ? 0.5 : 1}}
-            // opacityCallback={handlerOpacity}
-          />
+        <VehicleSelection
+          data={vehicle}
+          // vehicleContianer={{opacity: isIMageOpacity ? 0.5 : 1}}
+          // opacityCallback={handlerOpacity}
+        />
         <View
           style={[
             styles.horizontalLine,

@@ -5,14 +5,15 @@ import {
   TouchableOpacity,
   SafeAreaView,
 } from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 import CustomHeader from '../../components/CustomHeader';
+import {Paystack} from 'react-native-paystack-webview';
 import {fs, h, w} from '../../config';
 import CommonBtn from '../../components/CommonBtn';
 import Ionicons from 'react-native-vector-icons/dist/Ionicons';
-import {Paystack} from 'react-native-paystack-webview';
 
 const Payment = ({navigation}) => {
+  const [a, setA] = useState(false);
   return (
     <SafeAreaView style={{flex: 1}}>
       <CustomHeader
@@ -42,7 +43,7 @@ const Payment = ({navigation}) => {
           padding: h(2),
           flex: 1,
           justifyContent: 'space-around',
-          marginBottom: h(32),
+          marginBottom: h(42),
         }}>
         <Text style={{marginLeft: w(3)}}>Online payment</Text>
         <View style={styles.horizontalLine} />
@@ -55,44 +56,39 @@ const Payment = ({navigation}) => {
           }}>
           <TouchableOpacity
             style={{flexDirection: 'row'}}
-            onPress={() => navigation.navigate('PayStack')}>
+            onPress={() => setA(true)}>
+            {/* onPress={() => navigation.navigate('PayStack')}> */}
             <Ionicons name="menu" size={28} color="blue" />
             <Text
               style={{fontSize: fs(19), color: 'black', fontWeight: 'bold'}}>
               paystack
             </Text>
           </TouchableOpacity>
+          {a && (
+            <Paystack
+              paystackKey="pk_test_a88482aae1d55ae1910928b8389fd9b9029d0a1d"
+              amount={'250.00'}
+              billingEmail="paystackwebview@something.com"
+              activityIndicatorColor="green"
+              onCancel={e => {
+                console.log('e----->>', e);
+                setA(false)
+                // props.navigation.navigate("PickupLocation")
+              }}
+              onSuccess={res => {
+                setA(false)
+                console.log('res----->>>', res);
+                // props.navigation.navigate("PickupLocation")
+                // navigation.goBack(null)
+              }}
+              autoStart={true}
+            />
+          )}
           <TouchableOpacity>
             <Ionicons name="chevron-forward" size={26} color="grey" />
           </TouchableOpacity>
         </View>
         <View style={styles.horizontalLine} />
-        <TouchableOpacity>
-          <Text
-            style={{
-              marginLeft: w(3),
-              color: 'black',
-              fontWeight: 'bold',
-              fontSize: fs(17),
-            }}>
-            Credit Card
-          </Text>
-        </TouchableOpacity>
-        <View style={styles.horizontalLine} />
-        <TouchableOpacity>
-          <Text
-            style={{
-              marginLeft: w(3),
-              color: 'black',
-              fontWeight: 'bold',
-              fontSize: fs(17),
-            }}>
-            Bank Account
-          </Text>
-        </TouchableOpacity>
-        <View style={styles.horizontalLine} />
-        {/* <View style={[styles.horizontalLine,{marginVertical:h(11)}]} />
-        <View style={styles.horizontalLine} /> */}
       </View>
 
       <View>
