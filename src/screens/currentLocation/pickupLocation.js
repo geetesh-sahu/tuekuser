@@ -1,5 +1,13 @@
 import React, {useState, useEffect} from 'react';
-import {StyleSheet, Text, View, Image, TouchableOpacity,Platform,PermissionsAndroid} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  TouchableOpacity,
+  Platform,
+  PermissionsAndroid,
+} from 'react-native';
 import {useDispatch} from 'react-redux';
 import CustomHeader from '../../components/CustomHeader';
 import {fs, h, w} from '../../config';
@@ -29,12 +37,12 @@ const PickupLocation = props => {
     if (hasLocationPermission) {
       Geolocation.getCurrentPosition(
         position => {
-          console.log('position',position)
+          console.log('position', position);
           Geocoder.from(position.coords.latitude, position.coords.longitude)
             .then(json => {
-                console.log('json===>>',json)
-               const addressComponent = json.results[0].address_components;
-               const addresCurrent = addressComponent[1].long_name;
+              console.log('json===>>', json);
+              const addressComponent = json.results[0].address_components;
+              const addresCurrent = addressComponent[1].long_name;
               setaddress({
                 Address: addresCurrent,
                 latitude: position.coords.latitude,
@@ -55,19 +63,23 @@ const PickupLocation = props => {
   const locationHandler = (data, details) => {
     console.log('details====>>>>', details.geometry.location);
 
-    const lat = details.geometry.location.lat
-    const lng = details.geometry.location.lng
+    const lat = details.geometry.location.lat;
+    const lng = details.geometry.location.lng;
     const formatAddress = details.formatted_address;
     const destinationLocation = details.address_components[0].long_name;
     dispatch({
       type: DESTINATIONlOCATION,
-      payload: {cityName: destinationLocation, fullAddress: formatAddress,latitude:lat,longitude:lng  },
+      payload: {
+        cityName: destinationLocation,
+        fullAddress: formatAddress,
+        latitude: lat,
+        longitude: lng,
+      },
     });
     props.navigation.navigate('CurrentLocation');
   };
 
   const userCurrentLocation = () => {
-      
     showMessage({
       message: 'Simple message',
       type: 'info',
@@ -75,8 +87,6 @@ const PickupLocation = props => {
     dispatch({type: LOCATION, payload: address});
     props.navigation.navigate('CurrentLocation');
   };
-
-   
 
   return (
     <View style={styles.container}>
@@ -125,7 +135,7 @@ const PickupLocation = props => {
                 marginLeft: w(-1),
               }}>
               <GooglePlacesAutocomplete
-              placeholder='Enter your address'
+                placeholder="Enter your address"
                 fetchDetails={true}
                 query={{
                   key: 'AIzaSyBzhsIqqHLkDrRiSqt94pxHJCdHHXgA464',
