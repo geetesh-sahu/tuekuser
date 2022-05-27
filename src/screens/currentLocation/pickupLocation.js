@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
+import {StyleSheet, Text, View, Image, TouchableOpacity,Platform,PermissionsAndroid} from 'react-native';
 import {useDispatch} from 'react-redux';
 import CustomHeader from '../../components/CustomHeader';
 import {fs, h, w} from '../../config';
@@ -29,9 +29,10 @@ const PickupLocation = props => {
     if (hasLocationPermission) {
       Geolocation.getCurrentPosition(
         position => {
-          console.log(position);
+          console.log('position',position)
           Geocoder.from(position.coords.latitude, position.coords.longitude)
             .then(json => {
+                console.log('json===>>',json)
                const addressComponent = json.results[0].address_components;
                const addresCurrent = addressComponent[1].long_name;
               setaddress({
@@ -66,6 +67,7 @@ const PickupLocation = props => {
   };
 
   const userCurrentLocation = () => {
+      
     showMessage({
       message: 'Simple message',
       type: 'info',
@@ -73,6 +75,8 @@ const PickupLocation = props => {
     dispatch({type: LOCATION, payload: address});
     props.navigation.navigate('CurrentLocation');
   };
+
+   
 
   return (
     <View style={styles.container}>

@@ -4,7 +4,7 @@ import { LOCATION } from "../constants/type";
     data: [],
   };
   const locationReducer = (state = initialState, action) => {
-      console.log('locationReducer===>>reducre',action)
+     
     switch (action.type) {
       case LOCATION:
         return {

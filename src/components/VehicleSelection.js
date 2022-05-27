@@ -11,6 +11,7 @@ import {images} from '../constants';
 import {fs, h, w} from '../config';
 import Ionicons from 'react-native-vector-icons/dist/Ionicons';
 import Swiper from 'react-native-swiper';
+import FastImage from 'react-native-fast-image'
 
 const VehicleSelection = props => {
   const {
@@ -38,13 +39,14 @@ const VehicleSelection = props => {
         showsPagination={false}>
         {actualData &&
           actualData.map(item => {
+          
             return (
               <View style={styles.slide1}>
                 <TouchableOpacity
                   style={[customViewStyle, vehicleContianer]}
                   // onPress={onPressOpacity}
                 >
-                  <Image
+                  <FastImage
                     source={{
                       uri: `https://driverfiles.blob.core.windows.net/driverfiles/${item.image_Url}`,
                     }}
@@ -55,6 +57,7 @@ const VehicleSelection = props => {
                     {item.vehicle_Weight} /{item.other_Specification}/{' '}
                     {item.vehicle_width}
                   </Text>
+                
                 </TouchableOpacity>
               </View>
             );

@@ -37,14 +37,15 @@ const Payment = ({navigation}) => {
           Wallet
         </Text>
       </View>
+
       <View
         style={{
           padding: h(2),
           flex: 1,
           justifyContent: 'space-around',
-          marginBottom: h(32),
+          marginBottom: h(42),
         }}>
-        <Text style={{marginLeft: w(3)}}>Online payment</Text>
+        <Text style={{marginLeft: w(2),fontSize:fs(17)}}>Online payment</Text>
         <View style={styles.horizontalLine} />
         <View
           style={{
@@ -67,32 +68,6 @@ const Payment = ({navigation}) => {
           </TouchableOpacity>
         </View>
         <View style={styles.horizontalLine} />
-        <TouchableOpacity>
-          <Text
-            style={{
-              marginLeft: w(3),
-              color: 'black',
-              fontWeight: 'bold',
-              fontSize: fs(17),
-            }}>
-            Credit Card
-          </Text>
-        </TouchableOpacity>
-        <View style={styles.horizontalLine} />
-        <TouchableOpacity>
-          <Text
-            style={{
-              marginLeft: w(3),
-              color: 'black',
-              fontWeight: 'bold',
-              fontSize: fs(17),
-            }}>
-            Bank Account
-          </Text>
-        </TouchableOpacity>
-        <View style={styles.horizontalLine} />
-        {/* <View style={[styles.horizontalLine,{marginVertical:h(11)}]} />
-        <View style={styles.horizontalLine} /> */}
       </View>
 
       <View>

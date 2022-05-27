@@ -21,19 +21,7 @@ import VehicleSelection from '../../components/VehicleSelection';
 import axios from 'axios';
 import {useDispatch, useSelector} from 'react-redux';
 import {loader} from '../../redux/actions/loader';
-
-const DATA = [
-  {
-    image: images.vehicle_image,
-    area: '500kg / 1.8*1.3*1.1cm / 2.6cbm',
-    icon: <Ionicons name="chevron-forward" size={26} color="grey" />,
-  },
-  {
-    image: images.vehicle_image,
-    area: '500kg / 1.8*1.3*1.1cm / 2.6cbm',
-    icon: <Ionicons name="chevron-forward" size={26} color="grey" />,
-  },
-];
+import Geolocation from 'react-native-geolocation-service';
 
 const CurrentLocation = ({navigation}) => {
   const [isModal, setIsModal] = useState(false);
@@ -43,9 +31,29 @@ const CurrentLocation = ({navigation}) => {
 
   const dispatch = useDispatch();
 
-  useEffect(() => {
+  useEffect(async() => {
     vehicleList();
+    const res = await getCurrentLocation()
+    const {longitude,latitude} = res
+        console.log(longitude)
   }, []);
+
+  const getCurrentLocation = () =>
+    new Promise((resolve, reject) => {
+      Geolocation.getCurrentPosition(
+        position => {
+          const cords = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          };
+          resolve(cords);
+        },
+        error => {
+          reject(error.message);
+        },
+        {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+      );
+    });
 
   const vehicleList = () => {
     dispatch(loader(true));
@@ -57,7 +65,6 @@ const CurrentLocation = ({navigation}) => {
       })
       .catch(function (error) {
         console.log('error===>>', error);
-
         dispatch(loader(false));
       });
   };
@@ -125,14 +132,10 @@ const CurrentLocation = ({navigation}) => {
 
           <TouchableOpacity
             onPress={() => navigation.navigate('PickupLocation')}
-            style={{
-              flexDirection: 'row',
-              padding: w(5),
-              justifyContent: 'space-between',
-            }}>
+            style={styles.pikupLoc}>
             <Ionicons name="ios-location-outline" size={22} color="grey" />
             <View style={styles.location}>
-              <View style={{marginRight: w(2)}}>
+              <View style={{marginRight: w(2), width: w(67)}}>
                 <Text>Current pick up location</Text>
                 <Text style={styles.placeName}>{getLocation.Address}</Text>
                 <Text>{`Block A, Rm 2512 Pack view Avenue, Victorial\nIsland, Lagos.`}</Text>
@@ -303,6 +306,11 @@ const styles = StyleSheet.create({
   location: {
     alignItems: 'center',
     flexDirection: 'row',
+  },
+  pikupLoc: {
+    flexDirection: 'row',
+    padding: w(5),
+    justifyContent: 'space-between',
   },
 });
 
