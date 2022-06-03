@@ -1,13 +1,14 @@
 import {Platform} from 'react-native';
 
-export const BASE_URL = 'http://192.168.0.178:5001/api/';
+export const BASE_URL = 'http://tuketuke.azurewebsites.net/api/';
 
 export const fontfamily = Platform.select({
   android: {
      myriad_pro_semibold: 'Myriad-Pro-Semibold',
   },
   ios: {
-    myriad_pro_semibold: 'Myriad-Pro-Semibold',
+    // myriad_pro_semibold: 'Myriad-Pro-Semibold',
+    myriad_pro_semibold: '',
   },
 });
 

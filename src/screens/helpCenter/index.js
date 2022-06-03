@@ -16,13 +16,7 @@ const HelpCenter = ({navigation}) => {
         onPress={() => navigation.goBack()}
       />
       <Text
-        style={{
-          fontSize: fs(16),
-          color: colors.hex_414042,
-          fontWeight: '500',
-          marginHorizontal: w(8),
-          marginTop: h(4),
-        }}>
+        style={styles.orderText}>
         Last Order
       </Text>
       <View style={[styles.box, {backgroundColor: '#E9EBEE'}]}>
@@ -88,4 +82,11 @@ const styles = StyleSheet.create({
     color: colors.hex_414042,
     fontWeight: 'bold',
   },
+  orderText:{
+    fontSize: fs(16),
+    color: colors.hex_414042,
+    fontWeight: '500',
+    marginHorizontal: w(8),
+    marginTop: h(4),
+  }
 });

@@ -22,7 +22,7 @@ const Coupon = ({navigation}) => {
           <Text style={styles.btnText}>Redeem</Text>
         </TouchableOpacity>
       </View>
-      <View style={{flex: 6,alignItems:'center',marginTop:h(25)}}>
+      <View style={styles.couponBox}>
       <ImageBackground source={images.coupon_icon} resizeMode="contain" style={{width:w(50),height:h(12)}}>
       <Text style={styles.text}>Coupon</Text>
     </ImageBackground>
@@ -51,5 +51,10 @@ const styles = StyleSheet.create({
     lineHeight: 93,
     textAlign: "center",
     marginLeft:h(8)
+  },
+  couponBox:{
+    flex: 6,
+    alignItems:'center',
+    marginTop:h(25)
   }
 });

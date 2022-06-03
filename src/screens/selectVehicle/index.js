@@ -8,7 +8,7 @@ import {
   TextInput,
   ScrollView,
 } from 'react-native';
-import React, {useState, useEffect} from 'react';
+import React, {useContext} from 'react';
 import CustomHeader from '../../components/CustomHeader';
 import {fs, h, w} from '../../config';
 import VehicleSelection from '../../components/VehicleSelection';
@@ -16,37 +16,67 @@ import Ionicons from 'react-native-vector-icons/dist/Ionicons';
 import AntDesign from 'react-native-vector-icons/dist/AntDesign';
 import CommonBtn from '../../components/CommonBtn';
 import {images} from '../../constants';
+import {OrderContext} from '../../utils/context';
+import axios from 'axios';
 import {loader} from '../../redux/actions/loader';
 import {useDispatch} from 'react-redux';
-import axios from 'axios';
+import {showMessage} from 'react-native-flash-message';
 
-const SelectVehicle = (props) => {
-  console.log('props===>>>',props.route.params.destionationL.cityName)
-  const [vehicle, setvehicle] = useState('');
-
-  const currentL  = props.route.params.currentL.Address
-  const destinationL = props.route.params.destionationL.cityName
-
+const SelectVehicle = props => {
+  const [orderData, setOrderData] = useContext(OrderContext);
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    vehicleList();
-  }, []);
-
-  const vehicleList = () => {
+  const onSubmitHandler = () => {
     dispatch(loader(true));
     axios
-      .get('http://tuketuke.azurewebsites.net/api/VehicleList/VehicleList')
+      .post(
+        'http://tuketuke.azurewebsites.net/api/OrderDetails/AddOrder',
+        {
+          user_MobileNo: '9754944101',
+          pickup_Date: orderData.pickup_Date,
+          pickup_Time: '11:00am',
+          pick_Location: orderData.pick_Location,
+          pick_Address: orderData.pick_Address,
+          pick_Late: '22',
+          pick_City: orderData.pick_City,
+          destination_Location: orderData.destination_Location,
+          destination_Address: orderData.destination_Address,
+          destination_Late: 'string',
+          destiNation_City: orderData.destiNation_City,
+          reciver_Name: orderData.reciver_Name,
+          reciver_MobileNo: orderData.reciver_MobileNo,
+          vehicle_ID: orderData.vehicle_ID,
+          estimated_Cost: orderData.estimated_Cost.toString(),
+          pick_Long: 'string',
+          destination_Long: 'string',
+          distance: orderData.distance,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      )
       .then(function (response) {
-        dispatch(loader(false));
-        setvehicle(response.data.data);
+        console.log(';;;;;response====>>>--', response.data);
+        if (response.status == 200) {
+          if (response.data.status == 'Success') {
+            dispatch(loader(false));
+            console.log(response.data.message);
+            props.navigation.navigate('Payment');
+          } else {
+            dispatch(loader(false));
+          }
+        } else {
+          dispatch(loader(false));
+        }
       })
       .catch(function (error) {
-        console.log('error===>>', error);
-
+        console.log('error: ', error);
         dispatch(loader(false));
       });
   };
+
   return (
     <SafeAreaView style={{flex: 1}}>
       <CustomHeader
@@ -55,11 +85,11 @@ const SelectVehicle = (props) => {
         showLine={true}
       />
       <ScrollView>
-      <VehicleSelection
-            data={vehicle}
-            // vehicleContianer={{opacity: isIMageOpacity ? 0.5 : 1}}
-            // opacityCallback={handlerOpacity}
-          />
+        <VehicleSelection
+
+        // vehicleContianer={{opacity: isIMageOpacity ? 0.5 : 1}}
+        // opacityCallback={handlerOpacity}
+        />
         <View
           style={[
             styles.horizontalLine,
@@ -74,12 +104,14 @@ const SelectVehicle = (props) => {
           </View>
           <View style={styles.locationArea}>
             <TouchableOpacity style={styles.horizontal}>
-              <Text style={styles.placeName}>{currentL}</Text>
+              <Text style={styles.placeName}>{orderData.pick_City}</Text>
               <Ionicons name="chevron-forward" size={26} color="grey" />
             </TouchableOpacity>
             <View style={[styles.horizontalLine, {marginVertical: h(2)}]} />
             <TouchableOpacity style={styles.horizontal}>
-              <Text style={styles.placeName}>{destinationL}</Text>
+              <Text style={styles.placeName}>
+                {orderData.destination_Address}
+              </Text>
               <Ionicons name="chevron-forward" size={26} color="grey" />
             </TouchableOpacity>
           </View>
@@ -104,9 +136,15 @@ const SelectVehicle = (props) => {
           <View style={styles.textWithIcon}>
             <AntDesign name="user" size={25} />
             <TextInput
+              maxLength={10}
               placeholder={`Reciever's Number`}
               placeholderTextColor="lightgrey"
               style={{paddingLeft: 12}}
+              // orderData, setOrderData
+              onChangeText={val => {
+                setOrderData({...orderData, reciver_MobileNo: val});
+              }}
+              value={orderData.reciver_MobileNo}
             />
           </View>
           <View style={styles.textWithIcon}>
@@ -120,9 +158,14 @@ const SelectVehicle = (props) => {
         <View style={styles.NameInput}>
           <AntDesign name="user" size={25} />
           <TextInput
+            maxLength={15}
             placeholder="Name"
             placeholderTextColor={'lightgrey'}
             style={{paddingLeft: 12}}
+            onChangeText={val => {
+              setOrderData({...orderData, reciver_Name: val});
+            }}
+            value={orderData.reciver_Name}
           />
         </View>
         <View style={[styles.horizontalLine, {borderBottomWidth: h(2)}]} />
@@ -154,7 +197,7 @@ const SelectVehicle = (props) => {
           <CommonBtn
             text="Confirm"
             customBtnStyle={styles.confirmBtn}
-            onPress={() => props.navigation.navigate('Payment')}
+            onPress={onSubmitHandler}
           />
         </View>
       </ScrollView>
@@ -177,6 +220,7 @@ const styles = StyleSheet.create({
   placeName: {
     fontSize: fs(18),
     fontWeight: 'bold',
+    width:w(75)
   },
   verticleLine: {
     height: h(6),

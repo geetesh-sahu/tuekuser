@@ -8,9 +8,10 @@ import CustomHeader from '../../components/CustomHeader';
 import axios from 'axios';
 import {useDispatch} from 'react-redux';
 import {loader} from '../../redux/actions/loader';
+import {showMessage, hideMessage} from 'react-native-flash-message';
 
 const LoginScreen = ({navigation}) => {
-  const [number, setnumber] = useState('');
+  const [number, setnumber] = useState('9754944101');
   const [isError, setIsError] = useState(false);
 
   const dispatch = useDispatch();
@@ -20,26 +21,43 @@ const LoginScreen = ({navigation}) => {
       setIsError(true);
     } else {
       dispatch(loader(true));
-      axios
-        .get(
-          `http://192.168.0.178:5001/api/Login/CheckUser?Mobile_No=${number}`,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          },
-        )
-        // axios
-        //   .get('http://192.168.0.178:5001/api/Login/CheckUserDriver')
+      axios({
+        url: `http://tuketuke.azurewebsites.net/api/Login/SMSNotification?Mobile_No=%2B91${number}`,
+        method: 'post',
+        headers: {
+          // Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+      })
         .then(function (response) {
-          dispatch(loader(false));
-          console.log('respons===>>', response);
-          navigation.navigate('OtpScreen');
+           
+          if (response.status == 200) {
+            const {data} = response;
+          
+            if (data.status == 'Success') {
+              dispatch(loader(false));
+
+              navigation.navigate('OtpScreen', {
+                loginData: data.data,
+                mobileNo: number,
+              });
+            } else {
+              dispatch(loader(false));
+              alert(data.message);
+            }
+          } else {
+            dispatch(loader(false));
+            alert(response.statusText);
+          }
         })
         .catch(function (error) {
           dispatch(loader(false));
-          alert('phone number not found');
-
+          showMessage({
+            message: 'Phone number not found',
+            description: 'Please enter valid number',
+            type: 'danger',
+            style: {padding: 93},
+          });
         });
     }
   };
@@ -58,7 +76,7 @@ const LoginScreen = ({navigation}) => {
         <CommonInputField
           value={number}
           onChangeText={text => setnumber(text)}
-          maxLength={10}
+          maxLength={13}
           keyboardType={'numeric'}
           warningTitle={
             !number

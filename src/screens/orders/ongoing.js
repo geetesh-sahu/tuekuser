@@ -6,8 +6,7 @@ import Feather from 'react-native-vector-icons/dist/Feather';
 import {images} from '../../constants';
 import {fs, h, w} from '../../config';
 import MapView, {PROVIDER_GOOGLE} from 'react-native-maps';
-import { Avatar } from 'react-native-paper';
-
+import {Avatar} from 'react-native-paper';
 
 const Ongoing = () => {
   return (
@@ -29,20 +28,15 @@ const Ongoing = () => {
             latitudeDelta: 0.015,
             longitudeDelta: 0.0121,
           }}></MapView>
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            marginTop: h(5),
-            alignItems:'center',
-            marginHorizontal:w(5)
-          }}>
-          <View style={{flexDirection: 'row',alignItems:'center'}}>
-          <Avatar.Image size={38} source={{uri:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRwdWDzLOamaDu5EL-4RgpsPnSbE-xC-VvDyw&usqp=CAU'}} />
-            <Text
-              style={{color: '#414042', fontSize: fs(16), fontWeight: 'bold',marginLeft:w(2)}}>
-              Mr. Donald Trump
-            </Text>
+        <View style={styles.detailBox}>
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <Avatar.Image
+              size={38}
+              source={{
+                uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRwdWDzLOamaDu5EL-4RgpsPnSbE-xC-VvDyw&usqp=CAU',
+              }}
+            />
+            <Text style={styles.userName}>Mr. Donald Trump</Text>
           </View>
           <Text>New York M3598P</Text>
         </View>
@@ -65,24 +59,12 @@ const Ongoing = () => {
             </View>
           </View>
         </View>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            marginTop: h(4),
-            marginLeft: w(6),
-          }}>
+        <View style={styles.driverDetail}>
           <View style={{alignItems: 'center', flexDirection: 'row'}}>
-            <Text
-              style={{fontSize: fs(16), marginRight: w(1), color: '#414042'}}>
-              Call Driver
-            </Text>
+            <Text style={styles.call}>Call Driver</Text>
             <Feather name="phone-call" size={14} color="black" />
           </View>
-          <Text
-            style={{marginLeft: w(22), color: '#414042', fontWeight: 'bold'}}>
-            80866521489
-          </Text>
+          <Text style={styles.number}>80866521489</Text>
         </View>
       </View>
     </View>
@@ -112,5 +94,34 @@ const styles = StyleSheet.create({
   placeName: {
     fontSize: fs(15),
     fontWeight: 'bold',
+  },
+  number: {
+    marginLeft: w(22),
+    color: '#414042',
+    fontWeight: 'bold',
+  },
+  call: {
+    fontSize: fs(16),
+    marginRight: w(1),
+    color: '#414042',
+  },
+  detailBox: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: h(5),
+    alignItems: 'center',
+    marginHorizontal: w(5),
+  },
+  userName: {
+    color: '#414042',
+    fontSize: fs(16),
+    fontWeight: 'bold',
+    marginLeft: w(2),
+  },
+  driverDetail: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: h(4),
+    marginLeft: w(6),
   },
 });

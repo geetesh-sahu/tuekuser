@@ -4,100 +4,121 @@ import {
   View,
   SafeAreaView,
   TouchableOpacity,
-  FlatList,
   Image,
   ScrollView,
 } from 'react-native';
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import Ionicons from 'react-native-vector-icons/dist/Ionicons';
-import Entypo from 'react-native-vector-icons/dist/Entypo';
 import MaterialCommunityIcons from 'react-native-vector-icons/dist/MaterialCommunityIcons';
-import {colors, images} from '../../constants';
+import {images} from '../../constants';
 import {fs, h, height, w} from '../../config';
 import CommonInputField from '../../components/CommonInputField';
 import CommonBtn from '../../components/CommonBtn';
 import CommonModal from '../../components/CommonModal';
 import VehicleSelection from '../../components/VehicleSelection';
-import axios from 'axios';
 import {useDispatch, useSelector} from 'react-redux';
+import DateTimePicker, {
+  DateTimePickerAndroid,
+} from '@react-native-community/datetimepicker';
+import {OrderContext} from '../../utils/context';
+import moment from 'moment';
+import axios from 'axios';
 import {loader} from '../../redux/actions/loader';
-import Geolocation from 'react-native-geolocation-service';
 
 const CurrentLocation = ({navigation}) => {
   const [isModal, setIsModal] = useState(false);
+  const [calenderShow, setCalenderShow] = useState(false);
+  const [orderData, setOrderData] = useContext(OrderContext);
+  console.log('orderData: ', orderData);
   const [opacity, setopacity] = useState(false);
-  const [vehicle, setvehicle] = useState('');
   const [isIMageOpacity, setisIMageOpacity] = useState(false);
+  const [showIcon, setshowIcon] = useState(true);
+  const [changeAddress, setchangeAddress] = useState(true);
 
   const dispatch = useDispatch();
 
-  useEffect(async() => {
-    vehicleList();
-    const res = await getCurrentLocation()
-    const {longitude,latitude} = res
-        console.log(longitude)
-  }, []);
+  const [date, setDate] = useState(new Date());
 
-  const getCurrentLocation = () =>
-    new Promise((resolve, reject) => {
-      Geolocation.getCurrentPosition(
-        position => {
-          const cords = {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          };
-          resolve(cords);
-        },
-        error => {
-          reject(error.message);
-        },
-        {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
-      );
-    });
+  const onChange = (event, selectedDate) => {
+    setCalenderShow(false);
+    const date = moment(selectedDate).format();
+    setDate(selectedDate);
+    setOrderData({...orderData, pickup_Date: date, pickup_Time: date});
+  };
 
-  const vehicleList = () => {
+  const modalHandler = () => {
+    setshowIcon(false);
+    setIsModal(!isModal);
+  };
+
+  const closeModalHandler = item => {
+    setIsModal(item);
+    setshowIcon(true);
+  };
+
+  const onSubmitHandler = () => {
     dispatch(loader(true));
     axios
-      .get('http://tuketuke.azurewebsites.net/api/VehicleList/VehicleList')
+      .post(
+        'http://tuketuke.azurewebsites.net/api/OrderDetails/GetDistancebyAPI',
+        {
+          pick_Lat: orderData.Pick_Late,
+          pick_lng: orderData.Pick_Long,
+          destination_Lat: orderData.destination_Late,
+          destination_Lng: orderData.destination_Long,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      )
       .then(function (response) {
-        dispatch(loader(false));
-        setvehicle(response.data.data);
+        console.log('response====>>>--', response.data);
+        if (response.status == 200) {
+          if (response.data.status == 'Success') {
+            dispatch(loader(false));
+            setOrderData({
+              ...orderData,
+              estimated_Cost: response.data.data.amount,
+              distance: response.data.data.distance,
+            });
+            navigation.navigate('SelectVehicle');
+          } else {
+            dispatch(loader(false));
+          }
+        } else {
+          dispatch(loader(false));
+        }
       })
       .catch(function (error) {
-        console.log('error===>>', error);
+        console.log('error: ', error);
         dispatch(loader(false));
       });
   };
 
-  // const modalHandler = () => {
-  //   //  navigation.navigate("PickupLocation")
-  //   setIsModal(!isModal);
-  //   setopacity(!opacity);
-  // };
-
-  const nextHandler = () => {
-    navigation.navigate('SelectVehicle', {
-      currentL: getLocation,
-      destionationL: getdestinationLocation,
+  const exachangeAddressHandler = () => {
+    // setchangeAddress(!changeAddress);
+    setOrderData({
+      ...orderData,
+      Pick_Late: orderData.destination_Late,
+      Pick_Long: orderData.destination_Long,
+      pick_Location: orderData.destination_Location,
+      pick_Address: orderData.destination_Address,
+      pick_City: orderData.destiNation_City,
+      destination_Late: orderData.Pick_Late,
+      destination_Long: orderData.Pick_Long,
+      destiNation_City: orderData.pick_City,
+      destination_Address: orderData.pick_Address,
+      destination_Location: orderData.pick_Location,
     });
-  };
-
-  const getLocation = useSelector(state => state.locationReducer.data);
-
-  const getdestinationLocation = useSelector(
-    state => state.destinationLocationReducer.data,
-  );
-
-  const handlerOpacity = item => {
-    setisIMageOpacity(item);
   };
 
   return (
     <SafeAreaView
       style={{
         flex: 1,
-        backgroundColor: opacity ? 'black' : 'lightgrey',
-        opacity: opacity ? 0.5 : 1,
+        backgroundColor: 'lightgrey',
       }}>
       <ScrollView>
         <View style={styles.container1}>
@@ -105,20 +126,28 @@ const CurrentLocation = ({navigation}) => {
             <Ionicons name="location-sharp" size={22} color="grey" />
             <Text>New York City</Text>
           </View>
-          <View>
-            <TouchableOpacity style={styles.menuIconView}>
+          {showIcon ? (
+            <TouchableOpacity
+              style={styles.menuIconView}
+              onPress={modalHandler}>
               <View style={styles.square} />
               <View style={[styles.square, {marginHorizontal: h(0.7)}]} />
               <View style={styles.square} />
             </TouchableOpacity>
-          </View>
+          ) : null}
         </View>
         <View style={styles.container2}>
           <View style={styles.locatinDetail}>
             <Text>Pick up time </Text>
             <View style={styles.horizontalView}>
-              <Text style={styles.nowText}>Now</Text>
-              <TouchableOpacity>
+              <Text style={styles.nowText}>
+                {orderData.pickup_Date &&
+                  moment(orderData.pickup_Date).format('MMMM Do YYYY, h:mm a')}
+              </Text>
+              <TouchableOpacity
+                onPress={() => {
+                  setCalenderShow(true);
+                }}>
                 <Ionicons name="chevron-forward" size={26} color="grey" />
               </TouchableOpacity>
             </View>
@@ -135,10 +164,13 @@ const CurrentLocation = ({navigation}) => {
             style={styles.pikupLoc}>
             <Ionicons name="ios-location-outline" size={22} color="grey" />
             <View style={styles.location}>
-              <View style={{marginRight: w(2), width: w(67)}}>
+              <View style={styles.currentAddress}>
                 <Text>Current pick up location</Text>
-                <Text style={styles.placeName}>{getLocation.Address}</Text>
-                <Text>{`Block A, Rm 2512 Pack view Avenue, Victorial\nIsland, Lagos.`}</Text>
+
+                <View>
+                  <Text style={styles.placeName}>{orderData.pick_City}</Text>
+                  <Text>{`${orderData.pick_Location} ${orderData.pick_Address}`}</Text>
+                </View>
               </View>
               <TouchableOpacity>
                 <Ionicons name="chevron-forward" size={26} color="grey" />
@@ -147,35 +179,35 @@ const CurrentLocation = ({navigation}) => {
           </TouchableOpacity>
           <View style={styles.refreshView}>
             <View style={styles.length} />
-            <View style={{transform: [{rotate: '40deg'}]}}>
+            <TouchableOpacity
+              style={{transform: [{rotate: '40deg'}]}}
+              onPress={exachangeAddressHandler}>
               <MaterialCommunityIcons name="sync" size={30} color="black" />
-            </View>
+            </TouchableOpacity>
             <View style={styles.length} />
           </View>
 
-          {getdestinationLocation == '' ? (
+          {orderData.destination_Location == '' ? (
             <CommonInputField
               onFocus={() => navigation.navigate('PickupLocation')}
               placeholder="Enter destination address"
               inputStyle={styles.inputView}
             />
           ) : (
-            <View
-              style={{
-                flexDirection: 'row',
-                padding: w(5),
-                justifyContent: 'space-between',
-              }}>
+            <View style={styles.destinationStyle}>
               <Image source={images.flag_image} style={{marginLeft: w(2)}} />
               <TouchableOpacity
                 style={styles.location}
                 onPress={() => navigation.navigate('PickupLocation')}>
-                <View style={{marginRight: w(2), width: w(67)}}>
+                <View style={styles.dAddress}>
                   <Text>Destination address</Text>
-                  <Text style={styles.placeName}>
-                    {getdestinationLocation.cityName}
-                  </Text>
-                  <Text>{getdestinationLocation.fullAddress}</Text>
+
+                  <View>
+                    <Text style={styles.placeName}>
+                      {orderData.destination_Address}
+                    </Text>
+                    <Text>{orderData.destination_Location}</Text>
+                  </View>
                 </View>
                 <TouchableOpacity>
                   <Ionicons name="chevron-forward" size={26} color="grey" />
@@ -186,12 +218,16 @@ const CurrentLocation = ({navigation}) => {
 
           <Text style={styles.slide}>Slide to select vehicle</Text>
           <VehicleSelection
-            data={vehicle}
-            vehicleContianer={{opacity: isIMageOpacity ? 0.5 : 1}}
-            opacityCallback={handlerOpacity}
+            onScreenChange={(item, index) => {
+              setOrderData({...orderData, vehicle_ID: item.id});
+            }}
           />
           {isModal && (
-            <CommonModal showModal={isModal} navigation={navigation} />
+            <CommonModal
+              showModal={isModal}
+              navigation={navigation}
+              modalCallback={closeModalHandler}
+            />
           )}
           <View style={styles.confirmBtnView}>
             {/* <CommonBtn
@@ -202,11 +238,20 @@ const CurrentLocation = ({navigation}) => {
             <CommonBtn
               text="Next"
               customBtnStyle={styles.confirmBtn}
-              onPress={nextHandler}
+              onPress={onSubmitHandler}
             />
           </View>
         </View>
       </ScrollView>
+      {calenderShow && (
+        <DateTimePicker
+          testID="dateTimePicker"
+          value={date}
+          mode={'datetime'}
+          is24Hour={false}
+          onChange={onChange}
+        />
+      )}
     </SafeAreaView>
   );
 };
@@ -219,6 +264,7 @@ const styles = StyleSheet.create({
     marginTop: h(1),
     flexDirection: 'row',
     alignItems: 'center',
+    height: h(7),
   },
   cityName: {
     flex: 1,
@@ -232,6 +278,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     alignItems: 'center',
     justifyContent: 'center',
+    marginRight: w(1),
   },
   square: {
     backgroundColor: 'grey',
@@ -311,104 +358,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: w(5),
     justifyContent: 'space-between',
+    height: h(16),
+  },
+  destinationStyle: {
+    flexDirection: 'row',
+    padding: w(5),
+    justifyContent: 'space-between',
+    height: h(16),
+  },
+  dAddress: {
+    marginRight: w(2),
+    width: w(67),
+  },
+  currentAddress: {
+    marginRight: w(2),
+    width: w(67),
   },
 });
-
-// import { StyleSheet, Text, View } from 'react-native'
-// import React from 'react'
-// import Swiper from 'react-native-swiper'
-
-// const CurrnetLocation = () => {
-//   return (
-//     <Swiper style={styles.wrapper} showsButtons={true}>
-//     <View style={styles.slide1}>
-//       <Text style={styles.text}>Hello Swiper</Text>
-//     </View>
-//     <View style={styles.slide2}>
-//       <Text style={styles.text}>Beautiful</Text>
-//     </View>
-//     <View style={styles.slide3}>
-//       <Text style={styles.text}>And simple</Text>
-//     </View>
-//   </Swiper>
-//   )
-// }
-
-// export default CurrnetLocation
-
-// const styles = StyleSheet.create({
-//   wrapper: {},
-//   slide1: {
-//
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//     backgroundColor: '#9DD6EB'
-//   },
-//   slide2: {
-//
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//     backgroundColor: '#97CAE5'
-//   },
-//   slide3: {
-//
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//     backgroundColor: '#92BBD9'
-//   },
-//   text: {
-//     color: '#fff',
-//     fontSize: 30,
-//     fontWeight: 'bold'
-//   }
-// })
-
-// import React, { Component } from 'react'
-// import { AppRegistry, StyleSheet, Text, View } from 'react-native'
-
-// import Swiper from 'react-native-swiper'
-
-// const styles = StyleSheet.create({
-//   wrapper: {},
-//   slide1: {
-
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//     backgroundColor: '#9DD6EB'
-//   },
-//   slide2: {
-//     flex: 1,
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//     backgroundColor: '#97CAE5'
-//   },
-//   slide3: {
-//     flex: 1,
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//     backgroundColor: '#92BBD9'
-//   },
-//   text: {
-//     color: '#fff',
-//     fontSize: 30,
-//     fontWeight: 'bold'
-//   }
-// })
-
-// export default class CurrnetLocation extends Component {
-//   render() {
-//     return (
-//       <Swiper style={styles.wrapper} showsButtons={true}>
-//         <View style={styles.slide1}>
-//           <Text style={styles.text}>Hello Swiper</Text>
-//         </View>
-//         <View style={styles.slide2}>
-//           <Text style={styles.text}>Beautiful</Text>
-//         </View>
-//         <View style={styles.slide3}>
-//           <Text style={styles.text}>And simple</Text>
-//         </View>
-//       </Swiper>
-//     )
-//   }
-// }

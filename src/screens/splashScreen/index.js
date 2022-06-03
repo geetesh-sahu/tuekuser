@@ -4,7 +4,7 @@ import {colors, images} from '../../constants';
 
 const SplashScreen = ({navigation}) => {
   // setTimeout(() => {
-  //   navigation.navigate('WelcomeScreen');
+  //   navigation.navigate('LoginScreen');
   // }, 3000);
 
   return (

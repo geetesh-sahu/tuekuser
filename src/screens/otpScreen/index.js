@@ -1,30 +1,21 @@
 import {StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
-import React, {useEffect, useState, useContext} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {colors, images} from '../../constants';
-import CommonBtn from '../../components/CommonBtn';
 import CustomHeader from '../../components/CustomHeader';
-
+import OtpField from '../../components/OtpField';
 import {AuthContext} from '../../utils/context';
-import {
-  CodeField,
-  Cursor,
-  useBlurOnFulfill,
-  useClearByFocusCell,
-} from 'react-native-confirmation-code-field';
+import {showMessage} from 'react-native-flash-message';
+import axios from 'axios';
+import {useDispatch} from 'react-redux';
+import {loader} from '../../redux/actions/loader';
 
-const CELL_COUNT = 4;
-
-const OtpScreen = ({navigation}) => {
-  const [value, setValue] = useState('');
-  const ref = useBlurOnFulfill({value, cellCount: CELL_COUNT});
-  const [props, getCellOnLayoutHandler] = useClearByFocusCell({
-    value,
-    setValue,
-  });
+const OtpScreen = ({navigation, route}) => {
+  const {loginData, mobileNo} = route.params;
+  console.log('====>>loginData====>>', loginData);
+  const {signIn} = useContext(AuthContext);
   const [resendOtp, setresendOtp] = useState(true);
   const [timerCount, setTimer] = useState(60);
-  const {signIn} = useContext(AuthContext);
-
+  const dispatch = useDispatch();
   useEffect(() => {
     let interval = setInterval(() => {
       setTimer(lastTimerCount => {
@@ -33,11 +24,6 @@ const OtpScreen = ({navigation}) => {
       });
     }, 1000);
     return () => clearInterval(interval);
-  }, []);
-
-  var val = Math.floor(1000 + Math.random() * 9000);
-  useEffect(() => {
-    alert(val);
   }, []);
 
   const sendOtpHandler = () => {
@@ -51,6 +37,40 @@ const OtpScreen = ({navigation}) => {
     return () => clearInterval(interval);
   };
 
+  const onSubmitOTP = val => {
+    console.log('val: ', val);
+    if (val == loginData.otp) {
+      console.log('rgfgfg');
+      axios
+        .get(
+          `http://tuketuke.azurewebsites.net/api/Login/CheckUser?Mobile_No=${mobileNo}`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          },
+        )
+        .then(function (response) {
+          if (response.status == 200) {
+            if (response.data.status == 'Success') {
+              signIn(response.data.data);
+              dispatch(loader(false));
+            }else{
+              dispatch(loader(false));
+            }
+          } else {
+            dispatch(loader(false));
+          }
+        })
+        .catch(function (error) {
+          console.log('error: ', error);
+          dispatch(loader(false));
+        });
+    } else {
+      showMessage({message: 'otp not match', type: 'warning'});
+    }
+  };
+
   return (
     <View style={styles.container}>
       <CustomHeader onPress={() => navigation.goBack()} />
@@ -60,44 +80,9 @@ const OtpScreen = ({navigation}) => {
           <Text style={styles.heading}>Login to Tuketuke</Text>
         </View>
         <View style={styles.verificationTextView}>
-          <Text style={{fontSize: 16, fontWeight: 'bold', marginBottom: 12}}>
-            Enter verification number
-          </Text>
+          <Text style={styles.verificationText}>Enter verification number</Text>
         </View>
-        <View style={styles.otpView}>
-          <CodeField
-            ref={ref}
-            {...props}
-            value={value}
-            onChangeText={i => {
-              setValue(i);
-              const res = {
-                data: {
-                  token: '00000',
-                },
-              };
-              if (i.length == 4) {
-                signIn(res);
-              }
-            }}
-            cellCount={CELL_COUNT}
-            rootStyle={styles.codeFieldRoot}
-            keyboardType="number-pad"
-            textContentType="oneTimeCode"
-            renderCell={({index, symbol, isFocused}) => (
-              <Text
-                key={index}
-                style={[
-                  styles.cell,
-                  isFocused && styles.focusCell,
-                  {marginHorizontal: 5,borderRadius:8,backgroundColor:'white',borderWidth:0},
-                ]}
-                onLayout={getCellOnLayoutHandler(index)}>
-                {symbol || (isFocused ? <Cursor /> : null)}
-              </Text>
-            )}
-          />
-        </View>
+        <OtpField onSubmitOTP={val => onSubmitOTP(val)} />
       </View>
       {resendOtp && timerCount ? (
         <Text style={styles.sendOtp}>
@@ -144,27 +129,9 @@ const styles = StyleSheet.create({
     fontSize: 19,
     marginBottom: 12,
   },
-  otpView: {
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    width: 300,
-    alignSelf: 'center',
-  },
-  root: {flex: 1, padding: 20},
-  title: {textAlign: 'center', fontSize: 30},
-  codeFieldRoot: {marginTop: 20},
-  cell: {
-    width: 50,
-    height: 50,
-    lineHeight: 48,
-    fontSize: 24,
-    borderWidth: 1,
-    borderColor: '#00000030',
-    textAlign: 'center',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  focusCell: {
-    borderColor: '#000',
+  verificationText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 12,
   },
 });

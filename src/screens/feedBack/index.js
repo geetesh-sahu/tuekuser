@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   FlatList,
   TextInput,
-  SafeAreaView
+  SafeAreaView,
 } from 'react-native';
 import React, {useState} from 'react';
 import CustomHeader from '../../components/CustomHeader';
@@ -30,21 +30,18 @@ const FeedBack = ({navigation}) => {
 
   return (
     <SafeAreaView style={{flex: 1}}>
-      <CustomHeader text="Feedback" showLine={true} onPress={()=> navigation.goBack()} />
+      <CustomHeader
+        text="Feedback"
+        showLine={true}
+        onPress={() => navigation.goBack()}
+      />
       <View style={{marginTop: h(2)}}>
         <FlatList
           numColumns={2}
           data={DATA}
           renderItem={({item}) => {
             return (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  padding: 2,
-                  width:w(40),
-                  marginLeft:w(10)
-                }}>
+              <View style={styles.flatlistView}>
                 <TouchableOpacity onPress={changeIconLoc}>
                   {locationIcon ? (
                     <Ionicons
@@ -60,7 +57,14 @@ const FeedBack = ({navigation}) => {
                     />
                   )}
                 </TouchableOpacity>
-                <Text style={{color:colors.hex_414042,fontWeight:'bold',fontSize:fs(13)}}>{item.name}</Text>
+                <Text
+                  style={{
+                    color: colors.hex_414042,
+                    fontWeight: 'bold',
+                    fontSize: fs(13),
+                  }}>
+                  {item.name}
+                </Text>
               </View>
             );
           }}
@@ -74,10 +78,7 @@ const FeedBack = ({navigation}) => {
           />
         </View>
       </View>
-      <CommonBtn
-        text="Submit"
-        customBtnStyle={{width: w(25), height: h(6), borderRadius: 4}}
-      />
+      <CommonBtn text="Submit" customBtnStyle={styles.btn} />
     </SafeAreaView>
   );
 };
@@ -93,5 +94,17 @@ const styles = StyleSheet.create({
     marginTop: h(2),
     paddingLeft: w(4),
     paddingTop: h(3),
+  },
+  flatlistView: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 2,
+    width: w(40),
+    marginLeft: w(10),
+  },
+  btn: {
+    width: w(25),
+    height: h(6),
+    borderRadius: 4,
   },
 });

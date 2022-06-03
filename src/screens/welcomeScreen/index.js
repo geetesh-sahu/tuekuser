@@ -6,15 +6,15 @@ import {
   TouchableOpacity,
   Pressable,
 } from 'react-native';
-import React, {useState} from 'react';
-import {colors, images} from '../../constants';
+import React, { useState } from 'react';
+import { colors, images } from '../../constants';
 import CommonBtn from '../../components/CommonBtn';
 import Ionicons from 'react-native-vector-icons/dist/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/dist/MaterialCommunityIcons';
-import {h} from '../../config';
-import {fontfamily} from '../../constants';
+import { h, PlatformOS } from '../../config';
+import { fontfamily } from '../../constants';
 
-const WelcomeScreen = ({navigation}) => {
+const WelcomeScreen = ({ navigation }) => {
   const [locationIcon, setlocationIconcon] = useState(false);
   const [notificationIcon, setnotificationIcon] = useState(false);
 
@@ -35,18 +35,18 @@ const WelcomeScreen = ({navigation}) => {
       </Text>
 
       <View style={styles.servicesContainer}>
-        <View style={{flex: 0.5}}>
+        <View style={{ flex: 0.5 }}>
           <Image source={images.locationLogo} style={styles.horizontalImages} />
         </View>
-        <View style={{flex: 4}}>
-          <Text style={{fontSize: 16}}>Location Services</Text>
+        <View style={{ flex: 4 }}>
+          <Text style={{ fontSize: 16 }}>Location Services</Text>
           <Text
             style={
               styles.locationText
             }>{`Location accuracy allows us to better provide you\nwith more convenient and better services `}</Text>
         </View>
 
-        <View style={{marginTop: h(2)}}>
+        <View style={{ marginTop: h(2) }}>
           <TouchableOpacity onPress={changeIconLoc}>
             {locationIcon ? (
               <Ionicons name="checkbox" size={22} color={colors.hex_f66820} />
@@ -57,20 +57,20 @@ const WelcomeScreen = ({navigation}) => {
         </View>
       </View>
       <View style={styles.notification}>
-        <View style={{flex: 0.5}}>
+        <View style={{ flex: 0.5 }}>
           <Image
             source={images.notificationLogo}
             style={styles.horizontalImages}
           />
         </View>
-        <View style={{flex: 4}}>
-          <Text style={{fontSize: 16}}>Notifications</Text>
+        <View style={{ flex: 4 }}>
+          <Text style={{ fontSize: 16 }}>Notifications</Text>
           <Text style={styles.locationText}>
             {' '}
             {`Location accuracy allows us to better provide you\nwith more convenient and better services `}
           </Text>
         </View>
-        <View style={{marginTop: h(2)}}>
+        <View style={{ marginTop: h(2) }}>
           <TouchableOpacity onPress={changeIconNot}>
             {notificationIcon ? (
               <Ionicons name="checkbox" size={22} color={colors.hex_f66820} />
@@ -80,20 +80,20 @@ const WelcomeScreen = ({navigation}) => {
           </TouchableOpacity>
         </View>
       </View>
-      <View style={{marginTop: '40%'}}>
-        <View style={{marginLeft: 18}}>
-          <Text style={{fontSize: 12}}>
+      <View style={{ marginTop: '40%' }}>
+        <View style={{ marginLeft: 18 }}>
+          <Text style={{ fontSize: 12 }}>
             I have read and accepted your terms and condition
           </Text>
           <TouchableOpacity>
             <Text style={styles.condition}>Terms & Conditions</Text>
           </TouchableOpacity>
         </View>
-        <View style={{marginTop: 10}}>
+        <View style={{ marginTop: 10 }}>
           <CommonBtn
             text="Agree"
             onPress={() => navigation.navigate('LoginWithNumber')}
-            customBtnStyle={{padding:12,width:370}}
+            customBtnStyle={{ padding: 12, width: 370 }}
           />
         </View>
       </View>
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 14,
     alignSelf: 'center',
-    fontFamily: fontfamily.myriad_pro_semibold,
+    fontFamily: PlatformOS == 'android' ? fontfamily.myriad_pro_semibold : '',
   },
   servicesContainer: {
     flexDirection: 'row',

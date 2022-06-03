@@ -15,22 +15,29 @@ import AntDesign from 'react-native-vector-icons/dist/AntDesign';
 import {fs, h, w} from '../config';
 
 const CommonModal = props => {
-  const {showModal = false, navigation} = props;
-  const [modalVisible, setModalVisible] = useState(showModal);
+  const {showModal = false, navigation,modalCallback} = props;
+   const [modalVisible, setModalVisible] = useState(showModal);
+
+  const closeModel = () => {
+     setModalVisible(false)
+     modalCallback(false)
+  }
+
   return (
     <View style={styles.centeredView}>
       <Modal
         animationType="slide"
         transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          Alert.alert('Modal has been closed.');
-          setModalVisible(!modalVisible);
-        }}>
+         visible={modalVisible}
+        // onRequestClose={() => {
+        //   Alert.alert('Modal has been closed.');
+        //   setModalVisible(false);
+        // }}
+        >
         <View style={styles.centeredView}>
           <View style={{flex: 1}}>
             <TouchableOpacity
-              onPress={() => setModalVisible(!modalVisible)}
+               onPress={closeModel}
               style={{backgroundColor: 'white', padding: 12, borderRadius: 44}}>
               <Entypo name="cross" size={26} color="grey" />
             </TouchableOpacity>
@@ -40,28 +47,28 @@ const CommonModal = props => {
               style={{alignItems: 'center'}}
               onPress={() => navigation.navigate('Orders')}>
               <Ionicons name="car-outline" size={45} color="white" />
-              <Text style={{color:'white'}}> Orders</Text>
+              <Text style={{color:'white',fontWeight:'bold'}}> Orders</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={{alignItems: 'center'}}
               onPress={() => navigation.navigate('Wallet')}>
-              <AntDesign name="wallet" size={45} color="white" />
-              <Text style={{color:'white'}}> Wallet</Text>
+              <AntDesign name="wallet" size={45} color="white"  />
+              <Text style={{color:'white',fontWeight:'bold'}}> Wallet</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={{alignItems: 'center'}}
               onPress={() => navigation.navigate('HelpCenter')}>
-              <Entypo name="help-with-circle" size={45} color="white" />
-              <Text style={{color:'white'}}> Help</Text>
+              <Entypo name="help-with-circle" size={45} color="white"  />
+              <Text style={{color:'white',fontWeight:'bold'}}> Help</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={{alignItems: 'center'}}
               onPress={() => navigation.navigate('Settings')}>
               <Entypo name="menu" size={45} color="white" />
-              <Text style={{color:'white'}}> Settings</Text>
+              <Text style={{color:'white',fontWeight:'bold'}}> Settings</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -72,11 +79,17 @@ const CommonModal = props => {
 
 const styles = StyleSheet.create({
   centeredView: {
-    flex: 1,
-    // justifyContent: "center",
     alignItems: 'flex-end',
-    // marginTop: 22
-    padding: w(8),
+   
+    position: 'absolute',
+    alignSelf: 'center',
+     backgroundColor: 'black',
+    height: '100%',
+    width: '100%',
+    opacity: 0.6,
+    paddingRight:w(4),
+    paddingTop:h(1.2),
+    paddingBottom:h(7)
   },
 
   button: {

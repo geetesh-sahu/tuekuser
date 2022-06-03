@@ -1,4 +1,10 @@
-import {StyleSheet, Text, View,ActivityIndicator,Dimensions} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  ActivityIndicator,
+  Dimensions,
+} from 'react-native';
 import React, {useEffect, useMemo} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -26,8 +32,7 @@ import HelpCenter from '../screens/helpCenter';
 import FeedBack from '../screens/feedBack';
 import {AuthContext} from '../utils/context';
 import EncryptedStorage from 'react-native-encrypted-storage';
-import { useSelector } from 'react-redux';
-import PayStack from '../screens/payStack';
+import {useSelector} from 'react-redux';
 
 
 const Stack = createNativeStackNavigator();
@@ -63,10 +68,10 @@ const StackNavigation = () => {
   }, []);
 
   const tokenUser = async () => {
-    var userToken = '111';
+    var userToken = null;
     try {
       userToken = await EncryptedStorage.getItem('user_session');
-      console.log('tkn', userToken);
+      console.log('userToken:id ', userToken);
       dispatch({type: 'RESTORE_TOKEN', token: userToken});
     } catch (error) {
       console.log('error==>>', error);
@@ -76,7 +81,8 @@ const StackNavigation = () => {
   const authContext = useMemo(
     () => ({
       signIn: async res => {
-        const token = res.data.token;
+        const token = res.id;
+        console.log('tokenid: ', token);
         await EncryptedStorage.setItem('user_session', token);
         dispatch({type: 'SIGN_IN', token: token});
       },
@@ -95,10 +101,7 @@ const StackNavigation = () => {
           ) : state.userToken == null ? (
             <>
               {/* <Auth.Screen name="WelcomeScreen" component={WelcomeScreen} /> */}
-              <Auth.Screen
-                name="LoginWithNumber"
-                component={LoginWithNumber}
-              />
+              <Auth.Screen name="LoginWithNumber" component={LoginWithNumber} />
               <Auth.Screen name="LoginScreen" component={LoginScreen} />
               <Auth.Screen name="OtpScreen" component={OtpScreen} />
             </>
@@ -115,9 +118,9 @@ const StackNavigation = () => {
               />
 
               {/* <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} /> */}
-            
+
               <Stack.Screen name="PickupLocation" component={PickupLocation} />
-              
+
               <Stack.Screen name="PickupTime" component={PickupTime} />
               <Stack.Screen name="SelectVehicle" component={SelectVehicle} />
               <Stack.Screen name="Payment" component={Payment} />
@@ -132,7 +135,7 @@ const StackNavigation = () => {
               <Stack.Screen name="Settings" component={Settings} />
               <Stack.Screen name="HelpCenter" component={HelpCenter} />
               <Stack.Screen name="FeedBack" component={FeedBack} />
-              <Stack.Screen name="PayStack" component={PayStack} />
+              {/* <Stack.Screen name="PayStack" component={PayStack} /> */}
             </>
           )}
         </Stack.Navigator>

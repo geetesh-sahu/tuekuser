@@ -1,17 +1,12 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  FlatList,
-  TouchableOpacity,
-} from 'react-native';
-import React, {useState} from 'react';
-import {images} from '../constants';
-import {fs, h, w} from '../config';
+import {StyleSheet, Text, View, TouchableOpacity, FlatList} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {h, w} from '../config';
 import Ionicons from 'react-native-vector-icons/dist/Ionicons';
-import Swiper from 'react-native-swiper';
-import FastImage from 'react-native-fast-image'
+// import Swiper from 'react-native-swiper';
+import FastImage from 'react-native-fast-image';
+import {useDispatch, useSelector} from 'react-redux';
+import Swiper from 'react-native-custom-swiper';
+import {getVehicle} from '../redux/actions/vehicleList';
 
 const VehicleSelection = props => {
   const {
@@ -21,48 +16,49 @@ const VehicleSelection = props => {
     vehicledetail,
     vehicleContianer,
     opacityCallback,
+    onScreenChange=()=>{},
   } = props;
-  const [imageOpacity, setimageOpacity] = useState(true);
-  const actualData = data ? data : [];
+  const vehicleL = useSelector(state => state.vehicleListReducer.vehicle.data);
+  const actualData = vehicleL ? vehicleL : [];
 
-  const onPressOpacity = () => {
-    setimageOpacity(!imageOpacity);
-    opacityCallback(imageOpacity);
-  };
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getVehicle());
+  }, []);
+
   return (
     <View style={{height: h(32)}}>
       <Swiper
-        nextButton = {<Ionicons name="chevron-forward" size={32} color="black" />}
-        prevButton = {<Ionicons name="chevron-back" size={32} color="black" />}
-        style={styles.wrapper}
-        showsButtons={true}
-        showsPagination={false}>
-        {actualData &&
-          actualData.map(item => {
-          
-            return (
-              <View style={styles.slide1}>
-                <TouchableOpacity
-                  style={[customViewStyle, vehicleContianer]}
-                  // onPress={onPressOpacity}
-                >
-                  <FastImage
-                    source={{
-                      uri: `https://driverfiles.blob.core.windows.net/driverfiles/${item.image_Url}`,
-                    }}
-                    style={[styles.flatlistImage, customImageStyle]}
-                    resizeMode="cover"
-                  />
-                  <Text style={[styles.area, vehicledetail]}>
-                    {item.vehicle_Weight} /{item.other_Specification}/{' '}
-                    {item.vehicle_width}
-                  </Text>
-                
-                </TouchableOpacity>
-              </View>
-            );
-          })}
-      </Swiper>
+        style={{flex: 1}}
+        currentSelectIndex={0}
+        swipeData={actualData}
+        renderSwipeItem={(item, index) => {
+          return (
+            <View style={styles.slide1}>
+                <FastImage
+                  source={{
+                    uri: `https://driverfiles.blob.core.windows.net/driverfiles/${item.image_Url}`,
+                  }}
+                  style={[
+                    styles.flatlistImage,
+                    //  customImageStyle
+                  ]}
+                  resizeMode="cover"
+                />
+                <Text
+                  style={[
+                    styles.area,
+                    //  vehicledetail
+                  ]}>
+                  {item.vehicle_Weight} /{item.other_Specification}/{' '}
+                  {item.vehicle_Type}
+                </Text>
+            </View>
+          );
+        }}
+        onScreenChange={(index)=>onScreenChange(actualData[index])}
+      />
     </View>
   );
 };
@@ -80,18 +76,16 @@ const styles = StyleSheet.create({
     height: 130,
     alignSelf: 'center',
     marginVertical: h(3),
-   
   },
   area: {
-    marginLeft: h(10),
+    textAlign:"center"
   },
-  wrapper: {
-   
-  },
+  wrapper: {},
   slide1: {
-    flex: 1,
+    // flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    width: w(100),
   },
   slide2: {
     flex: 1,

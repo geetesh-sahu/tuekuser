@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   loginBtn: {
-    width: 355,
+    width: w(85),
     padding: 11,
     marginTop: h(6),
   },
