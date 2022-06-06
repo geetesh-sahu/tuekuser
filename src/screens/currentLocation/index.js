@@ -7,25 +7,26 @@ import {
   Image,
   ScrollView,
 } from 'react-native';
-import React, {useState, useEffect, useContext} from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Ionicons from 'react-native-vector-icons/dist/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/dist/MaterialCommunityIcons';
-import {images} from '../../constants';
-import {fs, h, height, w} from '../../config';
+import { images } from '../../constants';
+import { fs, h, height, w } from '../../config';
 import CommonInputField from '../../components/CommonInputField';
 import CommonBtn from '../../components/CommonBtn';
 import CommonModal from '../../components/CommonModal';
 import VehicleSelection from '../../components/VehicleSelection';
-import {useDispatch, useSelector} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import DateTimePicker, {
   DateTimePickerAndroid,
 } from '@react-native-community/datetimepicker';
-import {OrderContext} from '../../utils/context';
+import { OrderContext } from '../../utils/context';
 import moment from 'moment';
 import axios from 'axios';
-import {loader} from '../../redux/actions/loader';
+import { loader } from '../../redux/actions/loader';
+import { showMessage, hideMessage } from 'react-native-flash-message';
 
-const CurrentLocation = ({navigation}) => {
+const CurrentLocation = ({ navigation }) => {
   const [isModal, setIsModal] = useState(false);
   const [calenderShow, setCalenderShow] = useState(false);
   const [orderData, setOrderData] = useContext(OrderContext);
@@ -43,7 +44,7 @@ const CurrentLocation = ({navigation}) => {
     setCalenderShow(false);
     const date = moment(selectedDate).format();
     setDate(selectedDate);
-    setOrderData({...orderData, pickup_Date: date, pickup_Time: date});
+    setOrderData({ ...orderData, pickup_Date: date, pickup_Time: date });
   };
 
   const modalHandler = () => {
@@ -54,6 +55,28 @@ const CurrentLocation = ({navigation}) => {
   const closeModalHandler = item => {
     setIsModal(item);
     setshowIcon(true);
+  };
+
+  const verificationForOnSubmitHandler = () => {
+    if (orderData.pickup_Date == '') {
+      showMessage({
+        message: 'Please select date',
+        type: "warning"
+      })
+      return false
+    } if (orderData.pickup_Time == '') {
+      showMessage({
+        message: 'Please select date',
+        type: "warning"
+      })
+      return false
+    } if (orderData.pickup_Date == '') {
+      showMessage({
+        message: 'Please select date',
+        type: "warning"
+      })
+      return false
+    }
   };
 
   const onSubmitHandler = () => {
@@ -92,7 +115,10 @@ const CurrentLocation = ({navigation}) => {
         }
       })
       .catch(function (error) {
-        console.log('error: ', error);
+        showMessage({
+          message: 'Please fill current location and picup Location',
+          type: 'warning',
+        });
         dispatch(loader(false));
       });
   };
@@ -124,14 +150,14 @@ const CurrentLocation = ({navigation}) => {
         <View style={styles.container1}>
           <View style={styles.cityName}>
             <Ionicons name="location-sharp" size={22} color="grey" />
-            <Text>New York City</Text>
+            <Text>{orderData.pick_City}</Text>
           </View>
           {showIcon ? (
             <TouchableOpacity
               style={styles.menuIconView}
               onPress={modalHandler}>
               <View style={styles.square} />
-              <View style={[styles.square, {marginHorizontal: h(0.7)}]} />
+              <View style={[styles.square, { marginHorizontal: h(0.7) }]} />
               <View style={styles.square} />
             </TouchableOpacity>
           ) : null}
@@ -180,7 +206,7 @@ const CurrentLocation = ({navigation}) => {
           <View style={styles.refreshView}>
             <View style={styles.length} />
             <TouchableOpacity
-              style={{transform: [{rotate: '40deg'}]}}
+              style={{ transform: [{ rotate: '40deg' }] }}
               onPress={exachangeAddressHandler}>
               <MaterialCommunityIcons name="sync" size={30} color="black" />
             </TouchableOpacity>
@@ -195,7 +221,7 @@ const CurrentLocation = ({navigation}) => {
             />
           ) : (
             <View style={styles.destinationStyle}>
-              <Image source={images.flag_image} style={{marginLeft: w(2)}} />
+              <Image source={images.flag_image} style={{ marginLeft: w(2) }} />
               <TouchableOpacity
                 style={styles.location}
                 onPress={() => navigation.navigate('PickupLocation')}>
@@ -219,7 +245,7 @@ const CurrentLocation = ({navigation}) => {
           <Text style={styles.slide}>Slide to select vehicle</Text>
           <VehicleSelection
             onScreenChange={(item, index) => {
-              setOrderData({...orderData, vehicle_ID: item.id});
+              setOrderData({ ...orderData, vehicle_ID: item.id });
             }}
           />
           {isModal && (
