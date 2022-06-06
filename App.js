@@ -13,13 +13,51 @@ import NetInfo from '@react-native-community/netinfo';
 import Geolocation from 'react-native-geolocation-service';
 import FlashMessage from 'react-native-flash-message';
 import {OrderContext, OrderContextProvider, UserProvider} from './src/utils/context';
+import EncryptedStorage from 'react-native-encrypted-storage';
+import messaging from '@react-native-firebase/messaging';
 
 const App = () => {
-  NetInfo.fetch().then(state => {
-    console.log('Connection type', state.type);
-    console.log('Is connected?', state.isConnected);
-  });
+  useEffect(() => {
+    locationPermission();
+    requestUserPermission();
+  }, []);
   Geolocation.requestAuthorization('always');
+  async function requestUserPermission() {
+    const authStatus = await messaging().requestPermission();
+    const enabled =
+      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+    if (enabled) {
+      messaging()
+        .getToken()
+        .then(async res => {
+          try {
+            console.log('res', res);
+            const fcm =  await EncryptedStorage.setItem(
+              'fcm_id',
+              JSON.stringify({
+                fcm_id: res,
+              }),
+            );
+          console.log('fcm',fcm)
+          } catch (error) {
+            console.log('error', error);
+          }
+        })
+        .catch(error => {
+          console.log('err', error);
+        });
+      console.log('Authorization status:', authStatus);
+    }
+  }
+
+  useEffect(() => {
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
+    });
+
+    return unsubscribe;
+  }, []);
 
   const locationPermission = () =>
     new Promise(async (resolve, reject) => {
@@ -50,11 +88,6 @@ const App = () => {
           return reject(error);
         });
     });
-
-  useEffect(() => {
-    locationPermission();
-  }, []);
-
   return (
     <Provider store={store}>
       <UserProvider>

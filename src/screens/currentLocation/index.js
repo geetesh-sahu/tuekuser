@@ -57,7 +57,7 @@ const CurrentLocation = ({ navigation }) => {
     setshowIcon(true);
   };
 
-  const verificationForOnSubmitHandler = () => {
+  const validationForOnSubmitHandler = () => {
     if (orderData.pickup_Date == '') {
       showMessage({
         message: 'Please select date',
@@ -70,57 +70,80 @@ const CurrentLocation = ({ navigation }) => {
         type: "warning"
       })
       return false
-    } if (orderData.pickup_Date == '') {
+    } if (orderData.Pick_Late == '' ||
+      orderData.Pick_Long == '' ||
+      orderData.pick_Location == '' ||
+      orderData.pick_Address == '' ||
+      orderData.pick_City == '') {
       showMessage({
-        message: 'Please select date',
+        message: 'Please select pickup location again',
         type: "warning"
       })
       return false
-    }
+    } if (orderData.destination_Late == '' ||
+      orderData.destination_Long == '' ||
+      orderData.destiNation_City == '' ||
+      orderData.destination_Address == '' ||
+      orderData.destination_Location == '') {
+      showMessage({
+        message: 'Please select destination location again',
+        type: "warning"
+      })
+      return false
+    } if (orderData.vehicle_ID == '') {
+      showMessage({
+        message: 'Please select vehicle',
+        type: "warning"
+      })
+      return false
+    } return true
   };
 
   const onSubmitHandler = () => {
-    dispatch(loader(true));
-    axios
-      .post(
-        'http://tuketuke.azurewebsites.net/api/OrderDetails/GetDistancebyAPI',
-        {
-          pick_Lat: orderData.Pick_Late,
-          pick_lng: orderData.Pick_Long,
-          destination_Lat: orderData.destination_Late,
-          destination_Lng: orderData.destination_Long,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
+    const valid = validationForOnSubmitHandler()
+    if (valid) {
+      dispatch(loader(true));
+      axios
+        .post(
+          'http://tuketuke.azurewebsites.net/api/OrderDetails/GetDistancebyAPI',
+          {
+            pick_Lat: orderData.Pick_Late,
+            pick_lng: orderData.Pick_Long,
+            destination_Lat: orderData.destination_Late,
+            destination_Lng: orderData.destination_Long,
           },
-        },
-      )
-      .then(function (response) {
-        console.log('response====>>>--', response.data);
-        if (response.status == 200) {
-          if (response.data.status == 'Success') {
-            dispatch(loader(false));
-            setOrderData({
-              ...orderData,
-              estimated_Cost: response.data.data.amount,
-              distance: response.data.data.distance,
-            });
-            navigation.navigate('SelectVehicle');
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          },
+        )
+        .then(function (response) {
+          console.log('response====>>>--', response.data);
+          if (response.status == 200) {
+            if (response.data.status == 'Success') {
+              dispatch(loader(false));
+              setOrderData({
+                ...orderData,
+                estimated_Cost: response.data.data.amount,
+                distance: response.data.data.distance,
+              });
+              navigation.navigate('SelectVehicle');
+            } else {
+              dispatch(loader(false));
+            }
           } else {
             dispatch(loader(false));
           }
-        } else {
+        })
+        .catch(function (error) {
+          showMessage({
+            message: error.toString(),
+            type: 'warning',
+          });
           dispatch(loader(false));
-        }
-      })
-      .catch(function (error) {
-        showMessage({
-          message: 'Please fill current location and picup Location',
-          type: 'warning',
         });
-        dispatch(loader(false));
-      });
+    }
   };
 
   const exachangeAddressHandler = () => {
@@ -341,7 +364,7 @@ const styles = StyleSheet.create({
     borderRadius: 0,
     width: w(100),
     height: h(8),
-    marginTop:h(2)
+    marginTop: h(2)
   },
 
   area: {

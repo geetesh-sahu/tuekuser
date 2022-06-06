@@ -1,18 +1,18 @@
-import {StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
-import React, {useContext, useEffect, useState} from 'react';
-import {colors, images} from '../../constants';
+import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
+import { colors, images } from '../../constants';
 import CustomHeader from '../../components/CustomHeader';
 import OtpField from '../../components/OtpField';
-import {AuthContext} from '../../utils/context';
-import {showMessage} from 'react-native-flash-message';
+import { AuthContext } from '../../utils/context';
+import { showMessage } from 'react-native-flash-message';
 import axios from 'axios';
-import {useDispatch} from 'react-redux';
-import {loader} from '../../redux/actions/loader';
+import { useDispatch } from 'react-redux';
+import { loader } from '../../redux/actions/loader';
 
-const OtpScreen = ({navigation, route}) => {
-  const {loginData, mobileNo} = route.params;
+const OtpScreen = ({ navigation, route }) => {
+  const { loginData, mobileNo } = route.params;
   console.log('====>>loginData====>>', loginData);
-  const {signIn} = useContext(AuthContext);
+  const { signIn } = useContext(AuthContext);
   const [resendOtp, setresendOtp] = useState(true);
   const [timerCount, setTimer] = useState(60);
   const dispatch = useDispatch();
@@ -43,20 +43,33 @@ const OtpScreen = ({navigation, route}) => {
       console.log('rgfgfg');
       axios
         .get(
-          `http://tuketuke.azurewebsites.net/api/Login/CheckUser?Mobile_No=${mobileNo}`,
+          `http://tuketuke.azurewebsites.net/api/Login/UserLogin`,
+          {
+            "mobile_No": mobileNo,
+            "password": "string",
+            "fcM_ID": "string"
+          },
           {
             headers: {
               'Content-Type': 'application/json',
             },
           },
         )
+        // .get(
+        //   `http://tuketuke.azurewebsites.net/api/Login/CheckUser?Mobile_No=${mobileNo}`,
+        //   {
+        //     headers: {
+        //       'Content-Type': 'application/json',
+        //     },
+        //   },
+        // )
         .then(function (response) {
-          console.log("response of otpscren",response.data)
+          console.log("response of otpscren", response.data)
           if (response.status == 200) {
             if (response.data.status == 'Success') {
               signIn(response.data.data);
               dispatch(loader(false));
-            }else{
+            } else {
               dispatch(loader(false));
             }
           } else {
@@ -68,14 +81,14 @@ const OtpScreen = ({navigation, route}) => {
           dispatch(loader(false));
         });
     } else {
-      showMessage({message: 'otp not match', type: 'warning'});
+      showMessage({ message: 'otp not match', type: 'warning' });
     }
   };
 
   return (
     <View style={styles.container}>
       <CustomHeader onPress={() => navigation.goBack()} />
-      <View style={{marginTop: 60}}>
+      <View style={{ marginTop: 60 }}>
         <View>
           <Image source={images.commonLogo} style={styles.appLogo} />
           <Text style={styles.heading}>Login to Tuketuke</Text>
@@ -91,7 +104,7 @@ const OtpScreen = ({navigation, route}) => {
         </Text>
       ) : (
         <TouchableOpacity onPress={sendOtpHandler}>
-          <Text style={[styles.sendOtp, {color: 'red'}]}>Resend</Text>
+          <Text style={[styles.sendOtp, { color: 'red' }]}>Resend</Text>
         </TouchableOpacity>
       )}
     </View>
