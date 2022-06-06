@@ -51,6 +51,7 @@ const OtpScreen = ({navigation, route}) => {
           },
         )
         .then(function (response) {
+          console.log("response of otpscren",response.data)
           if (response.status == 200) {
             if (response.data.status == 'Success') {
               signIn(response.data.data);
