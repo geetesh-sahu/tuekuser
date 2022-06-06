@@ -5,7 +5,7 @@ import {
   ActivityIndicator,
   Dimensions,
 } from 'react-native';
-import React, {useContext, useEffect, useMemo,useState} from 'react';
+import React, {useContext, useEffect, useMemo, useState} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import SplashScreen from '../screens/splashScreen/index';
@@ -33,7 +33,6 @@ import FeedBack from '../screens/feedBack';
 import {AuthContext, UserContext} from '../utils/context';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import {useSelector} from 'react-redux';
-
 
 const Stack = createNativeStackNavigator();
 const Auth = createNativeStackNavigator();
@@ -85,9 +84,9 @@ const StackNavigation = () => {
   const authContext = useMemo(
     () => ({
       signIn: async res => {
-        console.log('res---->>>,,',res)
+        console.log('res---->>>,,', res);
         const token = res.id;
-        setUserData(res.data)
+        setUserData(res.data);
         console.log('tokenid: ', token);
         await EncryptedStorage.setItem('user_session', token);
         await EncryptedStorage.setItem('@userData', JSON.stringify(res));
