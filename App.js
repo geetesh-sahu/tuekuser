@@ -13,7 +13,6 @@ import NetInfo from '@react-native-community/netinfo';
 import Geolocation from 'react-native-geolocation-service';
 import FlashMessage from 'react-native-flash-message';
 import {OrderContext, OrderContextProvider, UserProvider} from './src/utils/context';
-import Map from './src/screens/currentLocation/map';
 
 const App = () => {
   NetInfo.fetch().then(state => {
@@ -60,9 +59,8 @@ const App = () => {
     <Provider store={store}>
       <UserProvider>
       <OrderContextProvider>
-        {/* <StackNavigation />
-        <FlashMessage position="top" /> */}
-        <Map />
+        <StackNavigation />
+        <FlashMessage position="top" />
       </OrderContextProvider>
       </UserProvider>
     </Provider>
