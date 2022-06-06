@@ -8,7 +8,7 @@ import {
   TextInput,
   ScrollView,
 } from 'react-native';
-import React, {useContext} from 'react';
+import React, {useContext, useState} from 'react';
 import CustomHeader from '../../components/CustomHeader';
 import {fs, h, w} from '../../config';
 import VehicleSelection from '../../components/VehicleSelection';
@@ -16,7 +16,7 @@ import Ionicons from 'react-native-vector-icons/dist/Ionicons';
 import AntDesign from 'react-native-vector-icons/dist/AntDesign';
 import CommonBtn from '../../components/CommonBtn';
 import {images} from '../../constants';
-import {OrderContext} from '../../utils/context';
+import {OrderContext, UserContext} from '../../utils/context';
 import axios from 'axios';
 import {loader} from '../../redux/actions/loader';
 import {useDispatch} from 'react-redux';
@@ -24,33 +24,20 @@ import {showMessage} from 'react-native-flash-message';
 
 const SelectVehicle = props => {
   const [orderData, setOrderData] = useContext(OrderContext);
+  const [userData, setUserData] = useContext(UserContext);
   const dispatch = useDispatch();
+
+  console.log('userData===0000>>>', userData);
 
   const onSubmitHandler = () => {
     dispatch(loader(true));
+    const params = orderData;
+    params.user_MobileNo = userData.mobile_No;
+    console.log('params: ', params);
     axios
       .post(
         'http://tuketuke.azurewebsites.net/api/OrderDetails/AddOrder',
-        {
-          user_MobileNo: '9754944101',
-          pickup_Date: orderData.pickup_Date,
-          pickup_Time: '11:00am',
-          pick_Location: orderData.pick_Location,
-          pick_Address: orderData.pick_Address,
-          pick_Late: '22',
-          pick_City: orderData.pick_City,
-          destination_Location: orderData.destination_Location,
-          destination_Address: orderData.destination_Address,
-          destination_Late: 'string',
-          destiNation_City: orderData.destiNation_City,
-          reciver_Name: orderData.reciver_Name,
-          reciver_MobileNo: orderData.reciver_MobileNo,
-          vehicle_ID: orderData.vehicle_ID,
-          estimated_Cost: orderData.estimated_Cost.toString(),
-          pick_Long: 'string',
-          destination_Long: 'string',
-          distance: orderData.distance,
-        },
+        params,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -220,7 +207,7 @@ const styles = StyleSheet.create({
   placeName: {
     fontSize: fs(18),
     fontWeight: 'bold',
-    width:w(75)
+    width: w(75),
   },
   verticleLine: {
     height: h(6),

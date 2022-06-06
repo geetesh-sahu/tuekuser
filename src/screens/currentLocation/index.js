@@ -315,6 +315,7 @@ const styles = StyleSheet.create({
     borderRadius: 0,
     width: w(100),
     height: h(8),
+    marginTop:h(2)
   },
 
   area: {

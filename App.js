@@ -12,7 +12,8 @@ import {store} from './src/redux/store/store';
 import NetInfo from '@react-native-community/netinfo';
 import Geolocation from 'react-native-geolocation-service';
 import FlashMessage from 'react-native-flash-message';
-import {OrderContext, OrderContextProvider} from './src/utils/context';
+import {OrderContext, OrderContextProvider, UserProvider} from './src/utils/context';
+import Map from './src/screens/currentLocation/map';
 
 const App = () => {
   NetInfo.fetch().then(state => {
@@ -57,10 +58,13 @@ const App = () => {
 
   return (
     <Provider store={store}>
+      <UserProvider>
       <OrderContextProvider>
-        <StackNavigation />
-        <FlashMessage position="top" />
+        {/* <StackNavigation />
+        <FlashMessage position="top" /> */}
+        <Map />
       </OrderContextProvider>
+      </UserProvider>
     </Provider>
   );
 };

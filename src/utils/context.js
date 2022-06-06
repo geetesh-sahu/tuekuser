@@ -1,6 +1,7 @@
 import React, {createContext, useState} from 'react';
 export const AuthContext = createContext();
 export const locationContext = createContext();
+ 
 
 export const OrderContext = React.createContext();
 export const OrderContextProvider = props => {
@@ -28,5 +29,16 @@ export const OrderContextProvider = props => {
     <OrderContext.Provider value={[orderData, setOrderData]}>
       {props.children}
     </OrderContext.Provider>
+  );
+};
+
+
+export const UserContext = React.createContext();
+export const UserProvider = props => {
+  const [userData, setUserData] = useState({});
+  return (
+    <UserContext.Provider value={[userData, setUserData]}>
+      {props.children}
+    </UserContext.Provider>
   );
 };

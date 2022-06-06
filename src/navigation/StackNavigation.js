@@ -5,7 +5,7 @@ import {
   ActivityIndicator,
   Dimensions,
 } from 'react-native';
-import React, {useEffect, useMemo} from 'react';
+import React, {useContext, useEffect, useMemo,useState} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import SplashScreen from '../screens/splashScreen/index';
@@ -30,7 +30,7 @@ import Coupon from '../screens/Coupon';
 import Settings from '../screens/settings';
 import HelpCenter from '../screens/helpCenter';
 import FeedBack from '../screens/feedBack';
-import {AuthContext} from '../utils/context';
+import {AuthContext, UserContext} from '../utils/context';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import {useSelector} from 'react-redux';
 
@@ -40,6 +40,7 @@ const Auth = createNativeStackNavigator();
 
 const StackNavigation = () => {
   const {loading} = useSelector(state => state.loaderReducer);
+  const [userData, setUserData] = useContext(UserContext);
 
   const [state, dispatch] = React.useReducer(
     (prevState, action) => {
@@ -71,7 +72,10 @@ const StackNavigation = () => {
     var userToken = null;
     try {
       userToken = await EncryptedStorage.getItem('user_session');
-      console.log('userToken:id ', userToken);
+      const userData = await EncryptedStorage.getItem('@userData');
+      if (userToken) {
+        setUserData(JSON.parse(userData));
+      }
       dispatch({type: 'RESTORE_TOKEN', token: userToken});
     } catch (error) {
       console.log('error==>>', error);
@@ -81,9 +85,12 @@ const StackNavigation = () => {
   const authContext = useMemo(
     () => ({
       signIn: async res => {
+        console.log('res---->>>,,',res)
         const token = res.id;
+        setUserData(res.data)
         console.log('tokenid: ', token);
         await EncryptedStorage.setItem('user_session', token);
+        await EncryptedStorage.setItem('@userData', JSON.stringify(res));
         dispatch({type: 'SIGN_IN', token: token});
       },
     }),

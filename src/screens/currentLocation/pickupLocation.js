@@ -115,6 +115,7 @@ const PickupLocation = props => {
   }
 
   const locationHandler = async (data, details) => {
+ 
     const lat = details.geometry.location.lat;
     const lng = details.geometry.location.lng;
     const formatAddress = details.formatted_address;
@@ -154,6 +155,8 @@ const PickupLocation = props => {
     dispatch({type: LOCATION, payload: address});
     props.navigation.navigate('CurrentLocation');
   };
+
+  
 
   return (
     <SafeAreaView style={styles.container}>
