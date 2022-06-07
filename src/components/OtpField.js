@@ -43,9 +43,7 @@ const OtpField = props => {
           //     token: "0000",
           //   },
           // };
-          console.log('i.length: ', i.length);
           if (i.length == 4) {
-            console.log('i.length: ', i.length);
             onSubmitOTP(i);
             // signIn(res);
           }

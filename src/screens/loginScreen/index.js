@@ -30,10 +30,9 @@ const LoginScreen = ({navigation}) => {
         },
       })
         .then(function (response) {
-           
           if (response.status == 200) {
             const {data} = response;
-          
+
             if (data.status == 'Success') {
               dispatch(loader(false));
 

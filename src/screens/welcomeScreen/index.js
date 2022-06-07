@@ -4,100 +4,134 @@ import {
   View,
   Image,
   TouchableOpacity,
-  Pressable,
+  ScrollView,
+  Platform,
+  PermissionsAndroid,
 } from 'react-native';
-import React, { useState } from 'react';
-import { colors, images } from '../../constants';
+import React, {useState, useEffect} from 'react';
+import {colors, images} from '../../constants';
 import CommonBtn from '../../components/CommonBtn';
-import Ionicons from 'react-native-vector-icons/dist/Ionicons';
-import MaterialCommunityIcons from 'react-native-vector-icons/dist/MaterialCommunityIcons';
-import { h, PlatformOS } from '../../config';
-import { fontfamily } from '../../constants';
+import {fs, h, w} from '../../config';
+import {fontfamily} from '../../constants';
+import Geolocation from 'react-native-geolocation-service';
+import CheckBox from '@react-native-community/checkbox';
 
-const WelcomeScreen = ({ navigation }) => {
-  const [locationIcon, setlocationIconcon] = useState(false);
-  const [notificationIcon, setnotificationIcon] = useState(false);
+const WelcomeScreen = ({navigation}) => {
+  const [notification, setnotification] = useState(false);
+  const [location, setlocation] = useState(false);
 
-  const changeIconLoc = () => {
-    setlocationIconcon(!locationIcon);
-  };
+  console.log('location====>>', location);
 
-  const changeIconNot = () => {
-    setnotificationIcon(!notificationIcon);
-  };
+  useEffect(() => {
+    if (location) {
+      locationPermission();
+    }
+  }, [location]);
+
+  const locationPermission = () =>
+    new Promise(async (resolve, reject) => {
+      if (Platform.ios === 'ios') {
+        try {
+          const permissionStatus = await Geolocation.requestAuthorization(
+            'whenInUse',
+          );
+          if (permissionStatus === 'granted') {
+            return resolve('granted');
+          }
+          reject('permission not granted');
+        } catch (error) {
+          return reject(error);
+        }
+      }
+      return PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      )
+        .then(granted => {
+          if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+            console.log('log1')
+            resolve('granted');
+          }
+          
+          return reject('Location Permission denied');
+        })
+        .catch(error => {
+          console.log('Ask Location permission error: ', error);
+          console.log('log3')
+          return reject(error);
+        });
+    });
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Image source={images.commonLogo} style={styles.appLogo} />
       <Text style={styles.heading}>Welcome to Tuketuke</Text>
-      <Text style={styles.textStyle}>
-        {`By clicking Agree below , you concent to and accept \nour terms and conditions`}{' '}
-      </Text>
+      <View style={{marginLeft: w(2)}}>
+        <Text style={{fontSize: fs(12)}}>
+          By clicking Agree below , you concent to and accept
+        </Text>
+        <Text style={{fontSize: fs(12)}}>our terms and conditions</Text>
+      </View>
 
       <View style={styles.servicesContainer}>
-        <View style={{ flex: 0.5 }}>
+        <View style={{flex: 0.5}}>
           <Image source={images.locationLogo} style={styles.horizontalImages} />
         </View>
-        <View style={{ flex: 4 }}>
-          <Text style={{ fontSize: 16 }}>Location Services</Text>
+        <View style={{flex: 4}}>
+          <Text style={{fontSize: 16}}>Location Services</Text>
           <Text
             style={
               styles.locationText
             }>{`Location accuracy allows us to better provide you\nwith more convenient and better services `}</Text>
         </View>
 
-        <View style={{ marginTop: h(2) }}>
-          <TouchableOpacity onPress={changeIconLoc}>
-            {locationIcon ? (
-              <Ionicons name="checkbox" size={22} color={colors.hex_f66820} />
-            ) : (
-              <Ionicons name="ios-checkbox-sharp" size={22} color='grey' />
-            )}
-          </TouchableOpacity>
+        <View style={{marginTop: h(2)}}>
+          <CheckBox
+            disabled={false}
+            value={location}
+            onValueChange={newValue => setlocation(newValue)}
+          />
         </View>
       </View>
       <View style={styles.notification}>
-        <View style={{ flex: 0.5 }}>
+        <View style={{flex: 0.5}}>
           <Image
             source={images.notificationLogo}
             style={styles.horizontalImages}
           />
         </View>
-        <View style={{ flex: 4 }}>
-          <Text style={{ fontSize: 16 }}>Notifications</Text>
-          <Text style={styles.locationText}>
-            {' '}
-            {`Location accuracy allows us to better provide you\nwith more convenient and better services `}
-          </Text>
+        <View style={{flex: 4}}>
+          <Text style={{fontSize: 16}}>Notifications</Text>
+          <Text
+            style={
+              styles.locationText
+            }>{`Location accuracy allows us to better provide you\nwith more convenient and better services `}</Text>
         </View>
-        <View style={{ marginTop: h(2) }}>
-          <TouchableOpacity onPress={changeIconNot}>
-            {notificationIcon ? (
-              <Ionicons name="checkbox" size={22} color={colors.hex_f66820} />
-            ) : (
-              <Ionicons name="ios-checkbox-sharp" size={22} color='grey' />
-            )}
-          </TouchableOpacity>
+        <View style={{marginTop: h(2)}}>
+          <CheckBox
+            disabled={false}
+            value={notification}
+            onValueChange={newValue => setnotification(newValue)}
+          />
         </View>
       </View>
-      <View style={{ marginTop: '40%' }}>
-        <View style={{ marginLeft: 18 }}>
-          <Text style={{ fontSize: 12 }}>
+      <View style={{marginTop: '40%'}}>
+        <View style={{marginLeft: 18}}>
+          <Text style={{fontSize: 12}}>
             I have read and accepted your terms and condition
           </Text>
           <TouchableOpacity>
             <Text style={styles.condition}>Terms & Conditions</Text>
           </TouchableOpacity>
         </View>
-        <View style={{ marginTop: 10 }}>
+        <View style={{marginTop: 10}}>
           <CommonBtn
             text="Agree"
-            onPress={() => navigation.navigate('LoginWithNumber')}
-            customBtnStyle={{ padding: 12, width: 370 }}
+            onPress={() => navigation.navigate('LoginScreen')}
+            bgColor
           />
         </View>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -115,7 +149,6 @@ const styles = StyleSheet.create({
     height: 25,
     resizeMode: 'contain',
   },
-
   container: {
     flex: 1,
     padding: 25,
@@ -127,7 +160,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 14,
     alignSelf: 'center',
-    fontFamily: PlatformOS == 'android' ? fontfamily.myriad_pro_semibold : '',
+    fontFamily: fontfamily.myriad_pro_semibold,
   },
   servicesContainer: {
     flexDirection: 'row',
@@ -149,7 +182,7 @@ const styles = StyleSheet.create({
   },
   locationText: {
     marginTop: 2,
-    fontSize: 12,
+    fontSize: fs(11),
   },
   textStyle: {
     marginTop: 10,

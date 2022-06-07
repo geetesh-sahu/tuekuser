@@ -8,7 +8,6 @@ export const signin = () => {
     axios
     .post(`${BASE_URL}Login`)
     .then(async res => {
-      console.log('res-====>>',res.data.message.token)
       if(!res.data.message.status){
         alert("wrong number")
         dispatch({type:SIGN_IN_FAILURE,Payload: {error :true}})

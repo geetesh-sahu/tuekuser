@@ -23,7 +23,6 @@ const CommonImagePicker = props => {
         },
       );
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        console.log('You can use the camera');
       } else {
         console.log('Camera permission denied');
       }
@@ -42,7 +41,6 @@ const CommonImagePicker = props => {
       height: 500,
       cropping: true,
     }).then(image => {
-      console.log(image);
       setcameraImage(image.path);
     });
   };

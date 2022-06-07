@@ -24,7 +24,6 @@ const Payment = ({navigation}) => {
 
   const onSuccessHandler = res => {
     setA(false);
-    console.log('res----->>>', res);
     dispatch(loader(true));
     axios
       .post(
@@ -45,7 +44,6 @@ const Payment = ({navigation}) => {
         },
       )
       .then(function (response) {
-        console.log('response====>>>--', response.data.message);
 
         if (response.status == 200) {
           if (response.data.status == 'Success') {
@@ -93,7 +91,6 @@ const Payment = ({navigation}) => {
               billingEmail="paystackwebview@something.com"
               activityIndicatorColor="green"
               onCancel={e => {
-                console.log('e----->>', e);
                 setA(false);
                 // props.navigation.navigate("PickupLocation")
               }}

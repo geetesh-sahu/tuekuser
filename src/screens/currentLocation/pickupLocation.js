@@ -60,8 +60,8 @@ const PickupLocation = props => {
               pick_City: address.city,
               Pick_Late: position.coords.latitude,
               Pick_Long: position.coords.longitude,
-              pick_Location: address.street,
-              pick_Address: addresCurrent,
+              pick_Location: address.street ? address.street : address.city,
+              pick_Address: addresCurrent ? addresCurrent : address.city,
             });
             // dispatch({type: LOCATION, payload: address});
           })
@@ -115,7 +115,6 @@ const PickupLocation = props => {
   }
 
   const locationHandler = async (data, details) => {
- 
     const lat = details.geometry.location.lat;
     const lng = details.geometry.location.lng;
     const formatAddress = details.formatted_address;
@@ -155,8 +154,6 @@ const PickupLocation = props => {
     dispatch({type: LOCATION, payload: address});
     props.navigation.navigate('CurrentLocation');
   };
-
-  
 
   return (
     <SafeAreaView style={styles.container}>

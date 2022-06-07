@@ -9,7 +9,7 @@ import React, {useContext, useEffect, useMemo, useState} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import SplashScreen from '../screens/splashScreen/index';
-// import WelcomeScreen from '../screens/welcomeScreen';
+import WelcomeScreen from '../screens/welcomeScreen';
 import LoginScreen from '../screens/loginScreen';
 import OtpScreen from '../screens/otpScreen/index';
 import CurrentLocation from '../screens/currentLocation';
@@ -84,10 +84,8 @@ const StackNavigation = () => {
   const authContext = useMemo(
     () => ({
       signIn: async res => {
-        console.log('res---->>>,,', res);
         const token = res.id;
         setUserData(res.data);
-        console.log('tokenid: ', token);
         await EncryptedStorage.setItem('user_session', token);
         await EncryptedStorage.setItem('@userData', JSON.stringify(res));
         dispatch({type: 'SIGN_IN', token: token});
@@ -106,7 +104,7 @@ const StackNavigation = () => {
             </>
           ) : state.userToken == null ? (
             <>
-              {/* <Auth.Screen name="WelcomeScreen" component={WelcomeScreen} /> */}
+              <Auth.Screen name="WelcomeScreen" component={WelcomeScreen} />
               <Auth.Screen name="LoginWithNumber" component={LoginWithNumber} />
               <Auth.Screen name="LoginScreen" component={LoginScreen} />
               <Auth.Screen name="OtpScreen" component={OtpScreen} />

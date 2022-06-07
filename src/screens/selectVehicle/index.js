@@ -24,16 +24,16 @@ import {showMessage} from 'react-native-flash-message';
 
 const SelectVehicle = props => {
   const [orderData, setOrderData] = useContext(OrderContext);
+  console.log('orderData: ', orderData);
   const [userData, setUserData] = useContext(UserContext);
   const dispatch = useDispatch();
 
-  console.log('userData===0000>>>', userData);
 
   const onSubmitHandler = () => {
     dispatch(loader(true));
     const params = orderData;
     params.user_MobileNo = userData.mobile_No;
-    console.log('params: ', params);
+    params.estimated_Cost = orderData.estimated_Cost.toString();
     axios
       .post(
         'http://tuketuke.azurewebsites.net/api/OrderDetails/AddOrder',
@@ -45,11 +45,9 @@ const SelectVehicle = props => {
         },
       )
       .then(function (response) {
-        console.log(';;;;;response====>>>--', response.data);
         if (response.status == 200) {
           if (response.data.status == 'Success') {
             dispatch(loader(false));
-            console.log(response.data.message);
             props.navigation.navigate('Payment');
           } else {
             dispatch(loader(false));

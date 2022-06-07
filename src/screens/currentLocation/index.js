@@ -7,30 +7,29 @@ import {
   Image,
   ScrollView,
 } from 'react-native';
-import React, { useState, useEffect, useContext } from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import Ionicons from 'react-native-vector-icons/dist/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/dist/MaterialCommunityIcons';
-import { images } from '../../constants';
-import { fs, h, height, w } from '../../config';
+import {images} from '../../constants';
+import {fs, h, height, w} from '../../config';
 import CommonInputField from '../../components/CommonInputField';
 import CommonBtn from '../../components/CommonBtn';
 import CommonModal from '../../components/CommonModal';
 import VehicleSelection from '../../components/VehicleSelection';
-import { useDispatch, useSelector } from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import DateTimePicker, {
   DateTimePickerAndroid,
 } from '@react-native-community/datetimepicker';
-import { OrderContext } from '../../utils/context';
+import {OrderContext} from '../../utils/context';
 import moment from 'moment';
 import axios from 'axios';
-import { loader } from '../../redux/actions/loader';
-import { showMessage, hideMessage } from 'react-native-flash-message';
+import {loader} from '../../redux/actions/loader';
+import {showMessage, hideMessage} from 'react-native-flash-message';
 
-const CurrentLocation = ({ navigation }) => {
+const CurrentLocation = ({navigation}) => {
   const [isModal, setIsModal] = useState(false);
   const [calenderShow, setCalenderShow] = useState(false);
   const [orderData, setOrderData] = useContext(OrderContext);
-  console.log('orderData: ', orderData);
   const [opacity, setopacity] = useState(false);
   const [isIMageOpacity, setisIMageOpacity] = useState(false);
   const [showIcon, setshowIcon] = useState(true);
@@ -44,7 +43,7 @@ const CurrentLocation = ({ navigation }) => {
     setCalenderShow(false);
     const date = moment(selectedDate).format();
     setDate(selectedDate);
-    setOrderData({ ...orderData, pickup_Date: date, pickup_Time: date });
+    setOrderData({...orderData, pickup_Date: date, pickup_Time: date});
   };
 
   const modalHandler = () => {
@@ -61,46 +60,55 @@ const CurrentLocation = ({ navigation }) => {
     if (orderData.pickup_Date == '') {
       showMessage({
         message: 'Please select date',
-        type: "warning"
-      })
-      return false
-    } if (orderData.pickup_Time == '') {
+        type: 'warning',
+      });
+      return false;
+    }
+    if (orderData.pickup_Time == '') {
       showMessage({
         message: 'Please select date',
-        type: "warning"
-      })
-      return false
-    } if (orderData.Pick_Late == '' ||
+        type: 'warning',
+      });
+      return false;
+    }
+    if (
+      orderData.Pick_Late == '' ||
       orderData.Pick_Long == '' ||
       orderData.pick_Location == '' ||
       orderData.pick_Address == '' ||
-      orderData.pick_City == '') {
+      orderData.pick_City == ''
+    ) {
       showMessage({
         message: 'Please select pickup location again',
-        type: "warning"
-      })
-      return false
-    } if (orderData.destination_Late == '' ||
+        type: 'warning',
+      });
+      return false;
+    }
+    if (
+      orderData.destination_Late == '' ||
       orderData.destination_Long == '' ||
       orderData.destiNation_City == '' ||
       orderData.destination_Address == '' ||
-      orderData.destination_Location == '') {
+      orderData.destination_Location == ''
+    ) {
       showMessage({
         message: 'Please select destination location again',
-        type: "warning"
-      })
-      return false
-    } if (orderData.vehicle_ID == '') {
+        type: 'warning',
+      });
+      return false;
+    }
+    if (orderData.vehicle_ID == '') {
       showMessage({
         message: 'Please select vehicle',
-        type: "warning"
-      })
-      return false
-    } return true
+        type: 'warning',
+      });
+      return false;
+    }
+    return true;
   };
 
   const onSubmitHandler = () => {
-    const valid = validationForOnSubmitHandler()
+    const valid = validationForOnSubmitHandler();
     if (valid) {
       dispatch(loader(true));
       axios
@@ -118,16 +126,16 @@ const CurrentLocation = ({ navigation }) => {
             },
           },
         )
-        .then(function (response) {
-          console.log('response====>>>--', response.data);
+        .then(async function (response) {
+          console.log('GetDistancebyAPI====>>>--', response.data);
           if (response.status == 200) {
             if (response.data.status == 'Success') {
-              dispatch(loader(false));
-              setOrderData({
+              await setOrderData({
                 ...orderData,
                 estimated_Cost: response.data.data.amount,
                 distance: response.data.data.distance,
               });
+              dispatch(loader(false));
               navigation.navigate('SelectVehicle');
             } else {
               dispatch(loader(false));
@@ -180,7 +188,7 @@ const CurrentLocation = ({ navigation }) => {
               style={styles.menuIconView}
               onPress={modalHandler}>
               <View style={styles.square} />
-              <View style={[styles.square, { marginHorizontal: h(0.7) }]} />
+              <View style={[styles.square, {marginHorizontal: h(0.7)}]} />
               <View style={styles.square} />
             </TouchableOpacity>
           ) : null}
@@ -229,7 +237,7 @@ const CurrentLocation = ({ navigation }) => {
           <View style={styles.refreshView}>
             <View style={styles.length} />
             <TouchableOpacity
-              style={{ transform: [{ rotate: '40deg' }] }}
+              style={{transform: [{rotate: '40deg'}]}}
               onPress={exachangeAddressHandler}>
               <MaterialCommunityIcons name="sync" size={30} color="black" />
             </TouchableOpacity>
@@ -244,7 +252,7 @@ const CurrentLocation = ({ navigation }) => {
             />
           ) : (
             <View style={styles.destinationStyle}>
-              <Image source={images.flag_image} style={{ marginLeft: w(2) }} />
+              <Image source={images.flag_image} style={{marginLeft: w(2)}} />
               <TouchableOpacity
                 style={styles.location}
                 onPress={() => navigation.navigate('PickupLocation')}>
@@ -268,7 +276,7 @@ const CurrentLocation = ({ navigation }) => {
           <Text style={styles.slide}>Slide to select vehicle</Text>
           <VehicleSelection
             onScreenChange={(item, index) => {
-              setOrderData({ ...orderData, vehicle_ID: item.id });
+              setOrderData({...orderData, vehicle_ID: item.id});
             }}
           />
           {isModal && (
@@ -364,7 +372,7 @@ const styles = StyleSheet.create({
     borderRadius: 0,
     width: w(100),
     height: h(8),
-    marginTop: h(2)
+    marginTop: h(2),
   },
 
   area: {
