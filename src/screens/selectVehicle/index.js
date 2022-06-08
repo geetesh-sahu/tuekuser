@@ -24,7 +24,6 @@ import {showMessage} from 'react-native-flash-message';
 
 const SelectVehicle = props => {
   const [orderData, setOrderData] = useContext(OrderContext);
-  console.log('orderData: ', orderData);
   const [userData, setUserData] = useContext(UserContext);
   const dispatch = useDispatch();
 

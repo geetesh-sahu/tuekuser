@@ -147,11 +147,11 @@ const PickupLocation = props => {
   };
 
   const userCurrentLocation = () => {
-    showMessage({
-      message: 'Simple message',
-      type: 'info',
-    });
-    dispatch({type: LOCATION, payload: address});
+    // showMessage({
+    //   message: 'Simple message',
+    //   type: 'info',
+    // });
+    // dispatch({type: LOCATION, payload: address});
     props.navigation.navigate('CurrentLocation');
   };
 
@@ -185,6 +185,7 @@ const PickupLocation = props => {
             </TouchableOpacity>
             <View style={styles.address}>
               <GooglePlacesAutocomplete
+                enablePoweredByContainer={false}
                 placeholder="Enter your address"
                 fetchDetails={true}
                 query={{

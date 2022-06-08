@@ -234,7 +234,7 @@ const Map = ({navigation}) => {
            console.log('response--->>',response)
           if (response.status == 200) {
             if (response.data.status == 'Success') {
-              signIn(response.data.data);
+              // signIn(response.data.data);
               dispatch(loader(false));
             }else{
               dispatch(loader(false));

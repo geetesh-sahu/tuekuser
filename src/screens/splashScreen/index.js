@@ -17,7 +17,7 @@ const SplashScreen = ({navigation}) => {
           <Image source={images.initialLogo} style={styles.logoImage} />
         </View>
         <Text style={styles.textName}>Tuketuke</Text>
-        <Text style={styles.textName}>Drive</Text>
+        {/* <Text style={styles.textName}></Text> */}
       </ImageBackground>
     </View>
   );
