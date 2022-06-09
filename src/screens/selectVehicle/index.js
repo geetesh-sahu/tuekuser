@@ -8,19 +8,18 @@ import {
   TextInput,
   ScrollView,
 } from 'react-native';
-import React, {useContext, useState} from 'react';
+import React, { useContext, useState } from 'react';
 import CustomHeader from '../../components/CustomHeader';
-import {fs, h, w} from '../../config';
+import { fs, h, w } from '../../config';
 import VehicleSelection from '../../components/VehicleSelection';
 import Ionicons from 'react-native-vector-icons/dist/Ionicons';
 import AntDesign from 'react-native-vector-icons/dist/AntDesign';
 import CommonBtn from '../../components/CommonBtn';
-import {images} from '../../constants';
-import {OrderContext, UserContext} from '../../utils/context';
+import { images } from '../../constants';
+import { OrderContext, UserContext } from '../../utils/context';
 import axios from 'axios';
-import {loader} from '../../redux/actions/loader';
-import {useDispatch} from 'react-redux';
-import {showMessage} from 'react-native-flash-message';
+import { loader } from '../../redux/actions/loader';
+import { useDispatch } from 'react-redux';
 
 const SelectVehicle = props => {
   const [orderData, setOrderData] = useContext(OrderContext);
@@ -62,7 +61,7 @@ const SelectVehicle = props => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView style={{ flex: 1 }}>
       <CustomHeader
         onPress={() => props.navigation.goBack()}
         text="Select vehicle"
@@ -70,28 +69,30 @@ const SelectVehicle = props => {
       />
       <ScrollView>
         <VehicleSelection
-
+          onScreenChange={(item, index) => {
+            setOrderData({ ...orderData, vehicle_ID: item.id });
+          }}
         // vehicleContianer={{opacity: isIMageOpacity ? 0.5 : 1}}
         // opacityCallback={handlerOpacity}
         />
         <View
           style={[
             styles.horizontalLine,
-            {marginTop: h(1), borderBottomWidth: w(1)},
+            { marginTop: h(1), borderBottomWidth: w(1) },
           ]}
         />
         <View style={styles.container}>
-          <View style={{alignItems: 'center'}}>
+          <View style={{ alignItems: 'center' }}>
             <Ionicons name="ios-location-outline" size={22} color="green" />
             <View style={styles.verticleLine} />
-            <Image source={images.flag_image} style={{marginLeft: w(3)}} />
+            <Image source={images.flag_image} style={{ marginLeft: w(3) }} />
           </View>
           <View style={styles.locationArea}>
             <TouchableOpacity style={styles.horizontal}>
               <Text style={styles.placeName}>{orderData.pick_City}</Text>
               <Ionicons name="chevron-forward" size={26} color="grey" />
             </TouchableOpacity>
-            <View style={[styles.horizontalLine, {marginVertical: h(2)}]} />
+            <View style={[styles.horizontalLine, { marginVertical: h(2) }]} />
             <TouchableOpacity style={styles.horizontal}>
               <Text style={styles.placeName}>
                 {orderData.destination_Address}
@@ -103,13 +104,13 @@ const SelectVehicle = props => {
         <View
           style={[
             styles.horizontalLine,
-            {marginTop: h(1), borderBottomWidth: w(3)},
+            { marginTop: h(1), borderBottomWidth: w(3) },
           ]}
         />
         <View style={styles.horizontalBox}>
-          <Text style={{marginLeft: w(4)}}>08066845214</Text>
+          <Text style={{ marginLeft: w(4) }}>{userData.mobile_No}</Text>
           <View style={styles.textWithIcon}>
-            <Text style={{fontSize: fs(10)}}>Select from contact</Text>
+            <Text style={{ fontSize: fs(10) }}>Select from contact</Text>
             <TouchableOpacity>
               <Ionicons name="chevron-forward" size={30} color="grey" />
             </TouchableOpacity>
@@ -123,16 +124,16 @@ const SelectVehicle = props => {
               maxLength={10}
               placeholder={`Reciever's Number`}
               placeholderTextColor="lightgrey"
-              style={{paddingLeft: 12}}
+              style={{ paddingLeft: 12 }}
               // orderData, setOrderData
               onChangeText={val => {
-                setOrderData({...orderData, reciver_MobileNo: val});
+                setOrderData({ ...orderData, reciver_MobileNo: val });
               }}
               value={orderData.reciver_MobileNo}
             />
           </View>
           <View style={styles.textWithIcon}>
-            <Text style={{fontSize: fs(10)}}>Select from contact</Text>
+            <Text style={{ fontSize: fs(10) }}>Select from contact</Text>
             <TouchableOpacity>
               <Ionicons name="chevron-forward" size={30} color="grey" />
             </TouchableOpacity>
@@ -145,16 +146,16 @@ const SelectVehicle = props => {
             maxLength={15}
             placeholder="Name"
             placeholderTextColor={'lightgrey'}
-            style={{paddingLeft: 12}}
+            style={{ paddingLeft: 12 }}
             onChangeText={val => {
-              setOrderData({...orderData, reciver_Name: val});
+              setOrderData({ ...orderData, reciver_Name: val });
             }}
             value={orderData.reciver_Name}
           />
         </View>
-        <View style={[styles.horizontalLine, {borderBottomWidth: h(2)}]} />
+        <View style={[styles.horizontalLine, { borderBottomWidth: h(2) }]} />
         <View style={styles.horizontalBox}>
-          <Text style={{marginLeft: w(4)}}>Pick up time</Text>
+          <Text style={{ marginLeft: w(4) }}>Pick up time</Text>
           <View style={styles.textWithIcon}>
             <Text style={styles.footerText}>Now</Text>
             <TouchableOpacity>
@@ -164,7 +165,7 @@ const SelectVehicle = props => {
         </View>
         <View style={[styles.horizontalLine]} />
         <View style={styles.horizontalBox}>
-          <Text style={{marginLeft: w(4)}}>Payment method</Text>
+          <Text style={{ marginLeft: w(4) }}>Payment method</Text>
           <View style={styles.textWithIcon}>
             <Text style={styles.footerText}>Wallet</Text>
             <TouchableOpacity>
@@ -175,7 +176,7 @@ const SelectVehicle = props => {
         <View style={[styles.horizontalLine]} />
         <View style={styles.numberBox}>
           <Text style={{}}>Estimated cost</Text>
-          <Text style={styles.number}> N4,000</Text>
+          <Text style={styles.number}> {`N ${orderData.estimated_Cost}`}</Text>
         </View>
         <View style={styles.confirmBtnView}>
           <CommonBtn

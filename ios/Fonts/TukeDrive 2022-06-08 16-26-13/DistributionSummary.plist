@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>TukeDrive.ipa</key>
+	<array>
+		<dict>
+			<key>architectures</key>
+			<array>
+				<string>arm64</string>
+			</array>
+			<key>buildNumber</key>
+			<string>1</string>
+			<key>certificate</key>
+			<dict>
+				<key>SHA1</key>
+				<string>DF49C1ADB95E3855C368E4E27BCF38E120479BFE</string>
+				<key>dateExpires</key>
+				<string>17/04/23</string>
+				<key>type</key>
+				<string>Apple Development</string>
+			</dict>
+			<key>entitlements</key>
+			<dict>
+				<key>application-identifier</key>
+				<string>63628YKQT7.org.TukeDrive</string>
+				<key>aps-environment</key>
+				<string>development</string>
+				<key>com.apple.developer.team-identifier</key>
+				<string>63628YKQT7</string>
+				<key>get-task-allow</key>
+				<true/>
+			</dict>
+			<key>name</key>
+			<string>TukeDrive.app</string>
+			<key>profile</key>
+			<dict>
+				<key>UUID</key>
+				<string>4ea73e11-3dc0-49a3-b370-882f7cec0108</string>
+				<key>dateExpires</key>
+				<string>08/06/23</string>
+				<key>name</key>
+				<string>iOS Team Provisioning Profile: org.TukeDrive</string>
+			</dict>
+			<key>team</key>
+			<dict>
+				<key>id</key>
+				<string>63628YKQT7</string>
+				<key>name</key>
+				<string>GOLDEN LADDER INTERNATIONAL LIMITED</string>
+			</dict>
+			<key>versionNumber</key>
+			<string>1.0</string>
+		</dict>
+	</array>
+</dict>
+</plist>

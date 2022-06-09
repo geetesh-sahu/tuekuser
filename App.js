@@ -1,14 +1,11 @@
 import {
-  StyleSheet,
-  Text,
-  View,
-  PermissionsAndroid,
-  Platform,
+  Alert,
+  SafeAreaView
 } from 'react-native';
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 import StackNavigation from './src/navigation/StackNavigation';
-import {Provider} from 'react-redux';
-import {store} from './src/redux/store/store';
+import { Provider } from 'react-redux';
+import { store } from './src/redux/store/store';
 import NetInfo from '@react-native-community/netinfo';
 import Geolocation from 'react-native-geolocation-service';
 import FlashMessage from 'react-native-flash-message';
@@ -34,6 +31,7 @@ const App = () => {
       messaging()
         .getToken()
         .then(async res => {
+          console.log('res: ', res);
           try {
             const fcm = await EncryptedStorage.setItem(
               'fcm_id',
@@ -60,14 +58,16 @@ const App = () => {
   }, []);
 
   return (
-    <Provider store={store}>
-      <UserProvider>
-        <OrderContextProvider>
-          <StackNavigation />
-          <FlashMessage position="top" />
-        </OrderContextProvider>
-      </UserProvider>
-    </Provider>
+    <SafeAreaView style={{ flex: 1 }}>
+      <Provider store={store}>
+        <UserProvider>
+          <OrderContextProvider>
+            <StackNavigation />
+            <FlashMessage position="top" />
+          </OrderContextProvider>
+        </UserProvider>
+      </Provider>
+    </SafeAreaView>
   );
 };
 export default App;

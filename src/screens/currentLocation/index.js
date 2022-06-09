@@ -7,26 +7,26 @@ import {
   Image,
   ScrollView,
 } from 'react-native';
-import React, {useState, useEffect, useContext} from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Ionicons from 'react-native-vector-icons/dist/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/dist/MaterialCommunityIcons';
-import {images} from '../../constants';
-import {fs, h, height, w} from '../../config';
+import { images } from '../../constants';
+import { fs, h, height, w } from '../../config';
 import CommonInputField from '../../components/CommonInputField';
 import CommonBtn from '../../components/CommonBtn';
 import CommonModal from '../../components/CommonModal';
 import VehicleSelection from '../../components/VehicleSelection';
-import {useDispatch, useSelector} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import DateTimePicker, {
   DateTimePickerAndroid,
 } from '@react-native-community/datetimepicker';
-import {OrderContext} from '../../utils/context';
+import { OrderContext } from '../../utils/context';
 import moment from 'moment';
 import axios from 'axios';
-import {loader} from '../../redux/actions/loader';
-import {showMessage, hideMessage} from 'react-native-flash-message';
+import { loader } from '../../redux/actions/loader';
+import { showMessage, hideMessage } from 'react-native-flash-message';
 
-const CurrentLocation = ({navigation}) => {
+const CurrentLocation = ({ navigation }) => {
   const [isModal, setIsModal] = useState(false);
   const [calenderShow, setCalenderShow] = useState(false);
   const [orderData, setOrderData] = useContext(OrderContext);
@@ -43,7 +43,7 @@ const CurrentLocation = ({navigation}) => {
     setCalenderShow(false);
     const date = moment(selectedDate).format();
     setDate(selectedDate);
-    setOrderData({...orderData, pickup_Date: date, pickup_Time: date});
+    setOrderData({ ...orderData, pickup_Date: date, pickup_Time: date });
   };
 
   const modalHandler = () => {
@@ -188,7 +188,7 @@ const CurrentLocation = ({navigation}) => {
               style={styles.menuIconView}
               onPress={modalHandler}>
               <View style={styles.square} />
-              <View style={[styles.square, {marginHorizontal: h(0.7)}]} />
+              <View style={[styles.square, { marginHorizontal: h(0.7) }]} />
               <View style={styles.square} />
             </TouchableOpacity>
           ) : null}
@@ -204,7 +204,8 @@ const CurrentLocation = ({navigation}) => {
               <TouchableOpacity
                 onPress={() => {
                   setCalenderShow(true);
-                }}>
+                }}
+                >
                 <Ionicons name="chevron-forward" size={26} color="grey" />
               </TouchableOpacity>
             </View>
@@ -217,27 +218,29 @@ const CurrentLocation = ({navigation}) => {
           />
 
           <TouchableOpacity
-            onPress={() => navigation.navigate('PickupLocation')}
-            style={styles.pikupLoc}>
-            <Ionicons name="ios-location-outline" size={22} color="grey" />
-            <View style={styles.location}>
-              <View style={styles.currentAddress}>
-                <Text>Current pick up location</Text>
-
+            onPress={() => navigation.navigate('PickupLocation')} style={{ flexDirection: "row", paddingVertical: 15,height:h(14) }}>
+            <View style={{ flex: 0.8, justifyContent: "center", alignItems: "center" }}>
+              <Ionicons name="ios-location-outline" size={22} color="grey" />
+            </View>
+            <View style={{ flex: 4.4, justifyContent: "center",marginLeft:w(6)}}>
+              <Text>Current pick up location</Text>
+              {
+                orderData.Pick_Late !== '' &&
                 <View>
                   <Text style={styles.placeName}>{orderData.pick_City}</Text>
                   <Text>{`${orderData.pick_Location} ${orderData.pick_Address}`}</Text>
                 </View>
-              </View>
-              <TouchableOpacity>
-                <Ionicons name="chevron-forward" size={26} color="grey" />
-              </TouchableOpacity>
+              }
+            </View>
+            <View style={{ flex: 0.8, justifyContent: "center", alignItems: "center" }}>
+              <Ionicons name="chevron-forward" size={26} color="grey" />
             </View>
           </TouchableOpacity>
+
           <View style={styles.refreshView}>
             <View style={styles.length} />
             <TouchableOpacity
-              style={{transform: [{rotate: '40deg'}]}}
+              style={{ transform: [{ rotate: '40deg' }] }}
               onPress={exachangeAddressHandler}>
               <MaterialCommunityIcons name="sync" size={30} color="black" />
             </TouchableOpacity>
@@ -252,7 +255,7 @@ const CurrentLocation = ({navigation}) => {
             />
           ) : (
             <View style={styles.destinationStyle}>
-              <Image source={images.flag_image} style={{marginLeft: w(2)}} />
+              <Image source={images.flag_image} style={{ marginLeft: w(2), }} />
               <TouchableOpacity
                 style={styles.location}
                 onPress={() => navigation.navigate('PickupLocation')}>
@@ -276,7 +279,7 @@ const CurrentLocation = ({navigation}) => {
           <Text style={styles.slide}>Slide to select vehicle</Text>
           <VehicleSelection
             onScreenChange={(item, index) => {
-              setOrderData({...orderData, vehicle_ID: item.id});
+              setOrderData({ ...orderData, vehicle_ID: item.id });
             }}
           />
           {isModal && (
@@ -287,11 +290,6 @@ const CurrentLocation = ({navigation}) => {
             />
           )}
           <View style={styles.confirmBtnView}>
-            {/* <CommonBtn
-            text="Confirm"
-            customBtnStyle={styles.confirmBtn}
-            onPress={modalHandler}
-          /> */}
             <CommonBtn
               text="Next"
               customBtnStyle={styles.confirmBtn}
@@ -423,6 +421,8 @@ const styles = StyleSheet.create({
     padding: w(5),
     justifyContent: 'space-between',
     height: h(16),
+    alignItems:'center',
+   
   },
   dAddress: {
     marginRight: w(2),

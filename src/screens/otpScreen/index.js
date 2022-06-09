@@ -18,6 +18,7 @@ const OtpScreen = ({navigation, route}) => {
   const [timerCount, setTimer] = useState(60);
   const dispatch = useDispatch();
   useEffect(() => {
+    showMessage({message:`${loginData.otp} this is the otp for now`})
     let interval = setInterval(() => {
       setTimer(lastTimerCount => {
         lastTimerCount <= 1 && clearInterval(interval);
