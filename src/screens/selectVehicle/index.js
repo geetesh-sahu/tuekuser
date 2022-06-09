@@ -121,7 +121,7 @@ const SelectVehicle = props => {
           <View style={styles.textWithIcon}>
             <AntDesign name="user" size={25} />
             <TextInput
-              maxLength={10}
+              maxLength={15}
               placeholder={`Reciever's Number`}
               placeholderTextColor="lightgrey"
               style={{ paddingLeft: 12 }}

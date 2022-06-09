@@ -7,6 +7,7 @@ import {
   ScrollView,
   Platform,
   PermissionsAndroid,
+
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { colors, images } from '../../constants';
@@ -15,18 +16,27 @@ import { fs, h, w } from '../../config';
 import { fontfamily } from '../../constants';
 import Geolocation from 'react-native-geolocation-service';
 import CheckBox from '@react-native-community/checkbox';
+import { showMessage } from 'react-native-flash-message';
+import Permissions, { PERMISSIONS, RESULTS } from 'react-native-permissions'
 
 const WelcomeScreen = ({ navigation }) => {
   const [notification, setnotification] = useState(false);
   const [location, setlocation] = useState(false);
 
-  console.log('location====>>', location);
-
   useEffect(() => {
-    if (location) {
-      locationPermission();
-    }
-  }, [location]);
+    const checkPermissions = async () => {
+      const permissionStatusAndroid = await Permissions.check(PERMISSIONS.ANDROID.ACCESS_COARSE_LOCATION)
+      const permissionStatusiOS = await Permissions.check(PERMISSIONS.IOS.LOCATION_ALWAYS)
+      if (Platform.OS == 'android') {
+        permissionStatusAndroid == 'granted' ? setlocation(true) : setlocation(false)
+        permissionStatusAndroid == 'granted' && navigation.navigate('LoginScreen')
+      } else {
+        permissionStatusiOS == 'granted' ? setlocation(true) : setlocation(false)
+        permissionStatusiOS == 'granted' && navigation.navigate('LoginScreen')
+      };
+    };
+    checkPermissions();
+  }, []);
 
   const locationPermission = () =>
     new Promise(async (resolve, reject) => {
@@ -36,27 +46,32 @@ const WelcomeScreen = ({ navigation }) => {
             'whenInUse',
           );
           if (permissionStatus === 'granted') {
+            setlocation(true)
             return resolve('granted');
           }
-          reject('permission not granted');
+          setlocation(false)
+          return reject('permission not granted');
         } catch (error) {
+          setlocation(false)
           return reject(error);
         }
       }
       return PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION,
         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
       )
         .then(granted => {
           if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-            console.log('log1')
-            resolve('granted');
+            setlocation(true)
+            return resolve('granted');
+          }else{
+            setlocation(false)
+            return reject('Location Permission denied');
           }
-
-          return reject('Location Permission denied');
         })
         .catch(error => {
-          console.log('Ask Location permission error: ', error);
-          console.log('log3')
+          setlocation(false)
           return reject(error);
         });
     });
@@ -86,9 +101,11 @@ const WelcomeScreen = ({ navigation }) => {
 
         <View style={{ marginTop: h(2) }}>
           <CheckBox
+            tintColors={{ true: colors.hex_f56725 }}
             disabled={false}
             value={location}
-            onValueChange={newValue => setlocation(newValue)}
+            onValueChange={newValue => locationPermission(newValue)}
+          // onValueChange={newValue => setlocation(newValue)}
           />
         </View>
       </View>
@@ -104,11 +121,12 @@ const WelcomeScreen = ({ navigation }) => {
           <Text
             style={
               styles.locationText
-            }>{`Location accuracy allows us to better provide you\nwith more convenient and better services `}</Text>
+            }>{`Mazamaza will like to enable your notification, so we can inform you better`}</Text>
         </View>
         <View style={{ marginTop: h(2) }}>
           <CheckBox
             disabled={false}
+            tintColors={{ true: colors.hex_f56725 }}
             value={notification}
             onValueChange={newValue => setnotification(newValue)}
           />
@@ -126,7 +144,7 @@ const WelcomeScreen = ({ navigation }) => {
         <View style={{ marginTop: 10 }}>
           <CommonBtn
             text="Agree"
-            onPress={() => navigation.navigate('LoginScreen')}
+            onPress={() => location ? navigation.navigate('LoginScreen') : showMessage({ message: "Location Permission Required", type: "warning" })}
             bgColor
           />
         </View>

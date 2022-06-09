@@ -1,17 +1,17 @@
-import {StyleSheet, Text, View, Image} from 'react-native';
-import React, {useState} from 'react';
-import {colors, images} from '../../constants';
+import { StyleSheet, Text, View, Image } from 'react-native';
+import React, { useState } from 'react';
+import { colors, images } from '../../constants';
 import CommonInputField from '../../components/CommonInputField';
-import {h, regx, w} from '../../config';
+import { h, regx, w } from '../../config';
 import CommonBtn from '../../components/CommonBtn';
 import CustomHeader from '../../components/CustomHeader';
 import axios from 'axios';
-import {useDispatch} from 'react-redux';
-import {loader} from '../../redux/actions/loader';
-import {showMessage, hideMessage} from 'react-native-flash-message';
+import { useDispatch } from 'react-redux';
+import { loader } from '../../redux/actions/loader';
+import { showMessage, hideMessage } from 'react-native-flash-message';
 
-const LoginScreen = ({navigation}) => {
-  const [number, setnumber] = useState('9754944101');
+const LoginScreen = ({ navigation }) => {
+  const [number, setnumber] = useState('919754944101');
   const [isError, setIsError] = useState(false);
 
   const dispatch = useDispatch();
@@ -21,8 +21,9 @@ const LoginScreen = ({navigation}) => {
       setIsError(true);
     } else {
       dispatch(loader(true));
+      var string = encodeURIComponent('+');
       axios({
-        url: `http://tuketuke.azurewebsites.net/api/Login/SMSNotification?Mobile_No=%2B91${number}`,
+        url: `http://tuketuke.azurewebsites.net/api/Login/SMSNotification?Mobile_No=${string}${number}`,
         method: 'post',
         headers: {
           // Accept: 'application/json',
@@ -31,31 +32,28 @@ const LoginScreen = ({navigation}) => {
       })
         .then(function (response) {
           if (response.status == 200) {
-            const {data} = response;
-
+            const { data } = response;
             if (data.status == 'Success') {
               dispatch(loader(false));
-
               navigation.navigate('OtpScreen', {
                 loginData: data.data,
                 mobileNo: number,
               });
             } else {
               dispatch(loader(false));
-              alert(data.message);
+              showMessage({ message: data.message, type: "warning" })
             }
           } else {
             dispatch(loader(false));
-            alert(response.statusText);
+            showMessage({ message: response.statusText, type: "warning" })
           }
         })
         .catch(function (error) {
           dispatch(loader(false));
           showMessage({
-            message: 'Phone number not found',
-            description: 'Please enter valid number',
+            message: `${error.response.status} ${error.response.statusText}`,
             type: 'danger',
-            style: {padding: 93},
+            style: { padding: 93 },
           });
         });
     }
@@ -64,7 +62,7 @@ const LoginScreen = ({navigation}) => {
   return (
     <View style={styles.container}>
       <CustomHeader onPress={() => navigation.goBack()} />
-      <View style={{marginTop: 60}}>
+      <View style={{ marginTop: 60 }}>
         <View>
           <Image source={images.commonLogo} style={styles.appLogo} />
           <Text style={styles.heading}>Login to Tuketuke</Text>
@@ -75,7 +73,7 @@ const LoginScreen = ({navigation}) => {
         <CommonInputField
           value={number}
           onChangeText={text => setnumber(text)}
-          maxLength={13}
+          maxLength={15}
           keyboardType={'numeric'}
           warningTitle={
             !number
@@ -93,7 +91,7 @@ const LoginScreen = ({navigation}) => {
       <CommonBtn
         text="Confirm"
         onPress={onConfirmHandler}
-        customBtnStyle={{padding: 12, width: 350}}
+        customBtnStyle={{ padding: 12, width: 350 }}
       />
     </View>
   );
