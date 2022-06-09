@@ -34,8 +34,8 @@ const LoginScreen = ({navigation}) => {
             const {data} = response;
 
             if (data.status == 'Success') {
+              
               dispatch(loader(false));
-
               navigation.navigate('OtpScreen', {
                 loginData: data.data,
                 mobileNo: number,

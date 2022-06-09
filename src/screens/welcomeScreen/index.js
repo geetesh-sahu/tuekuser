@@ -15,12 +15,11 @@ import {fs, h, w} from '../../config';
 import {fontfamily} from '../../constants';
 import Geolocation from 'react-native-geolocation-service';
 import CheckBox from '@react-native-community/checkbox';
+import { locationPermission } from '../../utils/helperFunction';
 
 const WelcomeScreen = ({navigation}) => {
   const [notification, setnotification] = useState(false);
   const [location, setlocation] = useState(false);
-
-  console.log('location====>>', location);
 
   useEffect(() => {
     if (location) {
@@ -28,38 +27,7 @@ const WelcomeScreen = ({navigation}) => {
     }
   }, [location]);
 
-  const locationPermission = () =>
-    new Promise(async (resolve, reject) => {
-      if (Platform.ios === 'ios') {
-        try {
-          const permissionStatus = await Geolocation.requestAuthorization(
-            'whenInUse',
-          );
-          if (permissionStatus === 'granted') {
-            return resolve('granted');
-          }
-          reject('permission not granted');
-        } catch (error) {
-          return reject(error);
-        }
-      }
-      return PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-      )
-        .then(granted => {
-          if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-            console.log('log1')
-            resolve('granted');
-          }
-          
-          return reject('Location Permission denied');
-        })
-        .catch(error => {
-          console.log('Ask Location permission error: ', error);
-          console.log('log3')
-          return reject(error);
-        });
-    });
+ 
 
   return (
     <ScrollView style={styles.container}>
@@ -89,6 +57,7 @@ const WelcomeScreen = ({navigation}) => {
             disabled={false}
             value={location}
             onValueChange={newValue => setlocation(newValue)}
+            tintColors={{true: colors.hex_f56725}}
           />
         </View>
       </View>
@@ -111,6 +80,7 @@ const WelcomeScreen = ({navigation}) => {
             disabled={false}
             value={notification}
             onValueChange={newValue => setnotification(newValue)}
+            tintColors={{true: colors.hex_f56725}}
           />
         </View>
       </View>
@@ -182,7 +152,7 @@ const styles = StyleSheet.create({
   },
   locationText: {
     marginTop: 2,
-    fontSize: fs(11),
+    fontSize: fs(10),
   },
   textStyle: {
     marginTop: 10,

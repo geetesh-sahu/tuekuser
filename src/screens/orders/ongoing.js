@@ -1,4 +1,4 @@
-import {StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
+import {StyleSheet, Text, View, Image, TouchableOpacity,Linking} from 'react-native';
 import React from 'react';
 import Ionicons from 'react-native-vector-icons/dist/Ionicons';
 import Entypo from 'react-native-vector-icons/dist/Entypo';
@@ -9,6 +9,11 @@ import MapView, {PROVIDER_GOOGLE} from 'react-native-maps';
 import {Avatar} from 'react-native-paper';
 
 const Ongoing = () => {
+
+ const onCallHandler = () => {
+  Linking.openURL(`tel:${9977106335}`)
+ }
+
   return (
     <View style={{flex: 1, backgroundColor: 'white'}}>
       {/* <View style={{flex: 1, alignItems: 'center', marginTop: h(18)}}>
@@ -60,10 +65,10 @@ const Ongoing = () => {
           </View>
         </View>
         <View style={styles.driverDetail}>
-          <View style={{alignItems: 'center', flexDirection: 'row'}}>
+          <TouchableOpacity style={{alignItems: 'center', flexDirection: 'row'}} onPress={onCallHandler}>
             <Text style={styles.call}>Call Driver</Text>
             <Feather name="phone-call" size={14} color="black" />
-          </View>
+          </TouchableOpacity>
           <Text style={styles.number}>80866521489</Text>
         </View>
       </View>

@@ -1,10 +1,4 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  ActivityIndicator,
-  Dimensions,
-} from 'react-native';
+import {StyleSheet, ActivityIndicator, Dimensions} from 'react-native';
 import React, {useContext, useEffect, useMemo, useState} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -40,6 +34,7 @@ const Auth = createNativeStackNavigator();
 const StackNavigation = () => {
   const {loading} = useSelector(state => state.loaderReducer);
   const [userData, setUserData] = useContext(UserContext);
+  const [isLoading, setisLoading] = useState(true);
 
   const [state, dispatch] = React.useReducer(
     (prevState, action) => {
@@ -48,22 +43,22 @@ const StackNavigation = () => {
           return {
             ...prevState,
             userToken: action.token,
-            isLoading: false,
           };
         case 'SIGN_IN':
           return {
             ...prevState,
             userToken: action.token,
-            isLoading: false,
           };
       }
     },
     {
-      isLoading: true,
       userToken: null,
     },
   );
   useEffect(() => {
+    setInterval(() => {
+      setisLoading(false);
+    }, 2000);
     tokenUser();
   }, []);
 
@@ -71,6 +66,7 @@ const StackNavigation = () => {
     var userToken = null;
     try {
       userToken = await EncryptedStorage.getItem('user_session');
+      console.log('userToken: ', userToken);
       const userData = await EncryptedStorage.getItem('@userData');
       if (userToken) {
         setUserData(JSON.parse(userData));
@@ -98,7 +94,7 @@ const StackNavigation = () => {
     <AuthContext.Provider value={authContext}>
       <NavigationContainer>
         <Stack.Navigator screenOptions={{headerShown: false}}>
-          {state.isLoading ? (
+          {isLoading ? (
             <>
               <Auth.Screen name="SplashScreen" component={SplashScreen} />
             </>
@@ -120,11 +116,7 @@ const StackNavigation = () => {
                 component={Orders}
                 options={{headerShown: true}}
               />
-
-              {/* <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} /> */}
-
               <Stack.Screen name="PickupLocation" component={PickupLocation} />
-
               <Stack.Screen name="PickupTime" component={PickupTime} />
               <Stack.Screen name="SelectVehicle" component={SelectVehicle} />
               <Stack.Screen name="Payment" component={Payment} />
@@ -139,7 +131,6 @@ const StackNavigation = () => {
               <Stack.Screen name="Settings" component={Settings} />
               <Stack.Screen name="HelpCenter" component={HelpCenter} />
               <Stack.Screen name="FeedBack" component={FeedBack} />
-              {/* <Stack.Screen name="PayStack" component={PayStack} /> */}
             </>
           )}
         </Stack.Navigator>

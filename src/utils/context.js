@@ -1,7 +1,6 @@
 import React, {createContext, useState} from 'react';
 export const AuthContext = createContext();
-export const locationContext = createContext();
- 
+
 
 export const OrderContext = React.createContext();
 export const OrderContextProvider = props => {

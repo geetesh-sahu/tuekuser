@@ -147,10 +147,7 @@ const PickupLocation = props => {
   };
 
   const userCurrentLocation = () => {
-    showMessage({
-      message: 'Simple message',
-      type: 'info',
-    });
+    
     dispatch({type: LOCATION, payload: address});
     props.navigation.navigate('CurrentLocation');
   };
