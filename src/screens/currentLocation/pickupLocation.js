@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useContext} from 'react';
+import React, {useState, useEffect, useContext, useRef} from 'react';
 import {
   StyleSheet,
   Text,
@@ -6,6 +6,8 @@ import {
   Image,
   TouchableOpacity,
   SafeAreaView,
+  TextInput,
+  ScrollView,
 } from 'react-native';
 import {useDispatch} from 'react-redux';
 import CustomHeader from '../../components/CustomHeader';
@@ -19,60 +21,16 @@ import Geocoder from 'react-native-geocoding';
 import {DESTINATIONlOCATION, LOCATION} from '../../redux/constants/type';
 import {showMessage, hideMessage} from 'react-native-flash-message';
 import {OrderContext} from '../../utils/context';
+import MapRowItem from '../../components/MapRowItem';
 
 Geocoder.init('AIzaSyBzhsIqqHLkDrRiSqt94pxHJCdHHXgA464');
-const PickupLocation = props => {
+const PickupLocation = ({navigation, route}) => {
+  const {ulocation} = route?.params;
+
+  const ref = useRef();
   const dispatch = useDispatch();
-  const [hasLocationPermission, sethasLocationPermission] = useState(true);
   const [orderData, setOrderData] = useContext(OrderContext);
-  const [address, setaddress] = useState('');
-  const [open, setOpen] = useState(false);
-  const [value, setValue] = useState(null);
-  const [items, setItems] = useState([
-    {label: 'Lagos', value: 'apple'},
-    {label: 'Banana', value: 'banana'},
-  ]);
-
-  useEffect(() => {
-    getCurrentLocation();
-  }, []);
-
-  const getCurrentLocation = () => {
-    Geolocation.getCurrentPosition(
-      position => {
-        Geocoder.from(position.coords.latitude, position.coords.longitude)
-          .then(async json => {
-            const addressComponent = json.results[0].address_components;
-            const addresCurrent = addressComponent[1].long_name;
-            setaddress({
-              Address: addresCurrent,
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude,
-            });
-            const address = await getAddressObject(
-              position.coords.latitude,
-              position.coords.longitude,
-              addresCurrent,
-              addressComponent,
-            );
-            setOrderData({
-              ...orderData,
-              pick_City: address.city,
-              Pick_Late: position.coords.latitude,
-              Pick_Long: position.coords.longitude,
-              pick_Location: address.street ? address.street : address.city,
-              pick_Address: addresCurrent ? addresCurrent : address.city,
-            });
-            // dispatch({type: LOCATION, payload: address});
-          })
-          .catch(error => console.log('error===>>', error));
-      },
-      error => {
-        console.log(error.code, error.message);
-      },
-      {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
-    );
-  };
+  const [isHeader, setIsHeader] = useState(true);
 
   function getAddressObject(lat, lng, formatAddress, address_components) {
     var ShouldBeComponent = {
@@ -125,96 +83,66 @@ const PickupLocation = props => {
       formatAddress,
       details.address_components,
     );
-    setOrderData({
-      ...orderData,
-      destination_Late: lat,
-      destination_Long: lng,
-      destiNation_City: address.city,
-      destination_Address: address.street ? address.street : formatAddress,
-      destination_Location: formatAddress ? formatAddress : address.street,
-    });
+    if (ulocation == 'Pickup address') {
+      setOrderData({
+        ...orderData,
+        Pick_Late: lat,
+        Pick_Long: lng,
+        pick_City: address.city,
+        pick_Address: address.street ? address.street : formatAddress,
+        pick_Location: formatAddress ? formatAddress : address.street,
+      });
+    } else if (ulocation == 'Destination address') {
+      setOrderData({
+        ...orderData,
+        destination_Late: lat,
+        destination_Long: lng,
+        destiNation_City: address.city,
+        destination_Address: address.street ? address.street : formatAddress,
+        destination_Location: formatAddress ? formatAddress : address.street,
+      });
+    }
 
-    dispatch({
-      type: DESTINATIONlOCATION,
-      payload: {
-        cityName: destinationLocation,
-        fullAddress: formatAddress,
-        latitude: lat,
-        longitude: lng,
-      },
-    });
-    props.navigation.navigate('CurrentLocation');
-  };
-
-  const userCurrentLocation = () => {
-    
-    dispatch({type: LOCATION, payload: address});
-    props.navigation.navigate('CurrentLocation');
+    navigation.navigate('CurrentLocation');
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <CustomHeader
-        onPress={() => props.navigation.goBack()}
-        text="Pickup location"
-      />
-      <View style={styles.box}>
-        <View style={{marginLeft: w(-4)}}>
-          <DropDownPicker
-            style={styles.dropdown}
-            open={open}
-            value={value}
-            items={items}
-            setOpen={setOpen}
-            setValue={setValue}
-            setItems={setItems}
-          />
-        </View>
-        <View style={styles.box2}>
-          <View style={{alignItems: 'center'}}>
-            <Ionicons name="ios-location-outline" size={22} color="red" />
-            <View style={styles.verticleLine} />
-            <Image source={images.flag_image} style={{marginLeft: w(4.1)}} />
-          </View>
-          <View style={{}}>
-            <TouchableOpacity onPress={userCurrentLocation}>
-              <Text style={styles.placeName}>Use current location</Text>
-            </TouchableOpacity>
-            <View style={styles.address}>
-              <GooglePlacesAutocomplete
-                placeholder="Enter your address"
-                fetchDetails={true}
-                query={{
-                  key: 'AIzaSyBzhsIqqHLkDrRiSqt94pxHJCdHHXgA464',
-                  language: 'en', // language of the results
-                }}
-                onPress={locationHandler}
-                onFail={error => console.error(error)}
-                requestUrl={{
-                  url: 'https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api',
-                  useOnPlatform: 'web',
-                }}
-                styles={{
-                  textInputContainer: {
-                    width: w(52),
-                  },
-                  textInput: {
-                    backgroundColor: 'transparent',
-                  },
-                  listView: {
-                    marginLeft: w(-32),
-                    width: w(100),
-                    marginTop: h(2),
-                  },
-                  row: {
-                    fontSize: fs(22),
-                    color: 'pink',
-                  },
-                }}
-              />
-            </View>
-          </View>
-        </View>
+      {isHeader && (
+        <CustomHeader onPress={() => navigation.goBack()} text={ulocation} />
+      )}
+      <View style={styles.address}>
+        <GooglePlacesAutocomplete
+          ref={ref}
+          renderRow={(data, index) => {
+            return (
+              <View>
+                <MapRowItem data={data} />
+              </View>
+            );
+          }}
+          enablePoweredByContainer={false}
+          placeholder="Enter your address"
+          fetchDetails={true}
+          query={{
+            key: 'AIzaSyBzhsIqqHLkDrRiSqt94pxHJCdHHXgA464',
+            language: 'en', // language of the results
+          }}
+          onPress={locationHandler}
+          onFail={error => console.error(error)}
+          requestUrl={{
+            url: 'https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api',
+            useOnPlatform: 'web',
+          }}
+          styles={{
+            textInputContainer: {
+              width: w(100),
+            },
+            textInput: {
+              backgroundColor: 'transparent',
+            },
+          }}
+        />
       </View>
     </SafeAreaView>
   );

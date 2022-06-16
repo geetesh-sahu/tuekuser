@@ -20,19 +20,17 @@ import {OrderContext, UserContext} from '../../utils/context';
 import axios from 'axios';
 import {loader} from '../../redux/actions/loader';
 import {useDispatch} from 'react-redux';
-import {showMessage} from 'react-native-flash-message';
 
 const SelectVehicle = props => {
   const [orderData, setOrderData] = useContext(OrderContext);
-  console.log('orderData: ', orderData);
   const [userData, setUserData] = useContext(UserContext);
   const dispatch = useDispatch();
-
 
   const onSubmitHandler = () => {
     dispatch(loader(true));
     const params = orderData;
-    params.user_MobileNo = userData.mobile_No;
+    params.user_MobileNo = userData.user_MobileNo;
+
     params.estimated_Cost = orderData.estimated_Cost.toString();
     axios
       .post(
@@ -45,6 +43,7 @@ const SelectVehicle = props => {
         },
       )
       .then(function (response) {
+        console.log('apporderApi+++++ ', response.data);
         if (response.status == 200) {
           if (response.data.status == 'Success') {
             dispatch(loader(false));
@@ -63,121 +62,124 @@ const SelectVehicle = props => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1}}>
-      <CustomHeader
-        onPress={() => props.navigation.goBack()}
-        text="Select vehicle"
-        showLine={true}
-      />
-      <ScrollView>
-        <VehicleSelection
-
-        // vehicleContianer={{opacity: isIMageOpacity ? 0.5 : 1}}
-        // opacityCallback={handlerOpacity}
+    <View style={{flex: 1}}>
+      <View>
+        <CustomHeader
+          onPress={() => props.navigation.goBack()}
+          text="Select vehicle"
+          showLine={true}
         />
-        <View
-          style={[
-            styles.horizontalLine,
-            {marginTop: h(1), borderBottomWidth: w(1)},
-          ]}
-        />
-        <View style={styles.container}>
-          <View style={{alignItems: 'center'}}>
-            <Ionicons name="ios-location-outline" size={22} color="green" />
-            <View style={styles.verticleLine} />
-            <Image source={images.flag_image} style={{marginLeft: w(3)}} />
+      </View>
+      <View style={{flex: 12}}>
+        <ScrollView>
+          <VehicleSelection
+            isSelectVehicle={true}
+            onScreenChange={(item, index) => {
+              setOrderData({...orderData, vehicle_ID: item.id});
+            }}
+            uiType={true}
+          />
+          <View style={[styles.horizontalLine, {borderBottomWidth: w(1)}]} />
+          <View style={styles.container}>
+            <View style={{alignItems: 'center'}}>
+              <Ionicons name="ios-location-outline" size={22} color="green" />
+              <View style={styles.verticleLine} />
+              <Image source={images.flag_image} style={{marginLeft: w(3)}} />
+            </View>
+            <View style={styles.locationArea}>
+              <TouchableOpacity style={styles.horizontal}>
+                <Text style={styles.placeName}>{orderData.pick_City}</Text>
+                <Ionicons name="chevron-forward" size={26} color="grey" />
+              </TouchableOpacity>
+              <View style={[styles.horizontalLine, {marginVertical: h(1)}]} />
+              <TouchableOpacity style={styles.horizontal}>
+                <Text style={styles.placeName}>
+                  {orderData.destination_Address}
+                </Text>
+                <Ionicons name="chevron-forward" size={26} color="grey" />
+              </TouchableOpacity>
+            </View>
           </View>
-          <View style={styles.locationArea}>
-            <TouchableOpacity style={styles.horizontal}>
-              <Text style={styles.placeName}>{orderData.pick_City}</Text>
-              <Ionicons name="chevron-forward" size={26} color="grey" />
-            </TouchableOpacity>
-            <View style={[styles.horizontalLine, {marginVertical: h(2)}]} />
-            <TouchableOpacity style={styles.horizontal}>
-              <Text style={styles.placeName}>
-                {orderData.destination_Address}
-              </Text>
-              <Ionicons name="chevron-forward" size={26} color="grey" />
-            </TouchableOpacity>
+          <View
+            style={[
+              styles.horizontalLine,
+              {marginTop: h(1), borderBottomWidth: w(3)},
+            ]}
+          />
+          <View style={styles.horizontalBox}>
+            <Text style={{marginLeft: w(4)}}>{userData.mobile_No}</Text>
+            <View style={styles.textWithIcon}>
+              <Text style={{fontSize: fs(10)}}>Select from contact</Text>
+              <TouchableOpacity>
+                <Ionicons name="chevron-forward" size={30} color="grey" />
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-        <View
-          style={[
-            styles.horizontalLine,
-            {marginTop: h(1), borderBottomWidth: w(3)},
-          ]}
-        />
-        <View style={styles.horizontalBox}>
-          <Text style={{marginLeft: w(4)}}>08066845214</Text>
-          <View style={styles.textWithIcon}>
-            <Text style={{fontSize: fs(10)}}>Select from contact</Text>
-            <TouchableOpacity>
-              <Ionicons name="chevron-forward" size={30} color="grey" />
-            </TouchableOpacity>
+          <View style={[styles.horizontalLine]} />
+          <View style={styles.horizontalBox}>
+            <View style={styles.textWithIcon}>
+              <AntDesign name="user" size={25} />
+              <TextInput
+                maxLength={15}
+                placeholder={`Reciever's Number`}
+                placeholderTextColor="lightgrey"
+                style={{paddingLeft: 12}}
+                // orderData, setOrderData
+                onChangeText={val => {
+                  setOrderData({...orderData, reciver_MobileNo: val});
+                }}
+                value={orderData.reciver_MobileNo}
+              />
+            </View>
+            <View style={styles.textWithIcon}>
+              <Text style={{fontSize: fs(10)}}>Select from contact</Text>
+              <TouchableOpacity>
+                <Ionicons name="chevron-forward" size={30} color="grey" />
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-        <View style={[styles.horizontalLine]} />
-        <View style={styles.horizontalBox}>
-          <View style={styles.textWithIcon}>
+          <View style={[styles.horizontalLine]} />
+          <View style={styles.NameInput}>
             <AntDesign name="user" size={25} />
             <TextInput
-              maxLength={10}
-              placeholder={`Reciever's Number`}
-              placeholderTextColor="lightgrey"
+              maxLength={15}
+              placeholder="Name"
+              placeholderTextColor={'lightgrey'}
               style={{paddingLeft: 12}}
-              // orderData, setOrderData
               onChangeText={val => {
-                setOrderData({...orderData, reciver_MobileNo: val});
+                setOrderData({...orderData, reciver_Name: val});
               }}
-              value={orderData.reciver_MobileNo}
+              value={orderData.reciver_Name}
             />
           </View>
-          <View style={styles.textWithIcon}>
-            <Text style={{fontSize: fs(10)}}>Select from contact</Text>
-            <TouchableOpacity>
-              <Ionicons name="chevron-forward" size={30} color="grey" />
-            </TouchableOpacity>
+          <View style={[styles.horizontalLine, {borderBottomWidth: h(2)}]} />
+          <View style={styles.horizontalBox}>
+            <Text style={{marginLeft: w(4)}}>Pick up time</Text>
+            <View style={styles.textWithIcon}>
+              <Text style={styles.footerText}>Now</Text>
+              <TouchableOpacity>
+                <Ionicons name="chevron-forward" size={26} color="grey" />
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-        <View style={[styles.horizontalLine]} />
-        <View style={styles.NameInput}>
-          <AntDesign name="user" size={25} />
-          <TextInput
-            maxLength={15}
-            placeholder="Name"
-            placeholderTextColor={'lightgrey'}
-            style={{paddingLeft: 12}}
-            onChangeText={val => {
-              setOrderData({...orderData, reciver_Name: val});
-            }}
-            value={orderData.reciver_Name}
-          />
-        </View>
-        <View style={[styles.horizontalLine, {borderBottomWidth: h(2)}]} />
-        <View style={styles.horizontalBox}>
-          <Text style={{marginLeft: w(4)}}>Pick up time</Text>
-          <View style={styles.textWithIcon}>
-            <Text style={styles.footerText}>Now</Text>
-            <TouchableOpacity>
-              <Ionicons name="chevron-forward" size={26} color="grey" />
-            </TouchableOpacity>
+          <View style={[styles.horizontalLine]} />
+          <View style={styles.horizontalBox}>
+            <Text style={{marginLeft: w(4)}}>Payment method</Text>
+            <View style={styles.textWithIcon}>
+              <Text style={styles.footerText}>Wallet</Text>
+              <TouchableOpacity>
+                <Ionicons name="chevron-forward" size={26} color="grey" />
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-        <View style={[styles.horizontalLine]} />
-        <View style={styles.horizontalBox}>
-          <Text style={{marginLeft: w(4)}}>Payment method</Text>
-          <View style={styles.textWithIcon}>
-            <Text style={styles.footerText}>Wallet</Text>
-            <TouchableOpacity>
-              <Ionicons name="chevron-forward" size={26} color="grey" />
-            </TouchableOpacity>
+          <View style={[styles.horizontalLine]} />
+          <View style={styles.numberBox}>
+            <Text style={{}}>Estimated cost</Text>
+            <Text style={styles.number}> {`N${orderData.estimated_Cost}`}</Text>
           </View>
-        </View>
-        <View style={[styles.horizontalLine]} />
-        <View style={styles.numberBox}>
-          <Text style={{}}>Estimated cost</Text>
-          <Text style={styles.number}> N4,000</Text>
-        </View>
+        </ScrollView>
+      </View>
+      <View style={{flex: 1}}>
         <View style={styles.confirmBtnView}>
           <CommonBtn
             text="Confirm"
@@ -185,8 +187,8 @@ const SelectVehicle = props => {
             onPress={onSubmitHandler}
           />
         </View>
-      </ScrollView>
-    </SafeAreaView>
+      </View>
+    </View>
   );
 };
 
@@ -209,7 +211,7 @@ const styles = StyleSheet.create({
   },
   verticleLine: {
     height: h(6),
-    width: 1,
+    width: w(0.1),
     backgroundColor: 'black',
   },
   container: {
@@ -235,7 +237,7 @@ const styles = StyleSheet.create({
   number: {
     fontSize: fs(26),
     color: 'black',
-    fontWeight: '100',
+    fontWeight: '400',
   },
   numberBox: {
     flexDirection: 'row',
@@ -261,6 +263,7 @@ const styles = StyleSheet.create({
   textWithIcon: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginVertical: w(1),
   },
   NameInput: {
     flexDirection: 'row',

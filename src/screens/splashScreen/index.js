@@ -3,9 +3,7 @@ import React from 'react';
 import {colors, images} from '../../constants';
 
 const SplashScreen = ({navigation}) => {
-  // setTimeout(() => {
-  //   navigation.navigate('LoginScreen');
-  // }, 3000);
+ 
 
   return (
     <View style={{flex: 1}}>
@@ -17,7 +15,6 @@ const SplashScreen = ({navigation}) => {
           <Image source={images.initialLogo} style={styles.logoImage} />
         </View>
         <Text style={styles.textName}>Tuketuke</Text>
-        <Text style={styles.textName}>Drive</Text>
       </ImageBackground>
     </View>
   );

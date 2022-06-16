@@ -9,15 +9,7 @@ import Swiper from 'react-native-custom-swiper';
 import {getVehicle} from '../redux/actions/vehicleList';
 
 const VehicleSelection = props => {
-  const {
-    customViewStyle,
-    customImageStyle,
-    data,
-    vehicledetail,
-    vehicleContianer,
-    opacityCallback,
-    onScreenChange=()=>{},
-  } = props;
+  const {uiType = false, onScreenChange = () => {}} = props;
   const vehicleL = useSelector(state => state.vehicleListReducer.vehicle.data);
   const actualData = vehicleL ? vehicleL : [];
 
@@ -28,64 +20,99 @@ const VehicleSelection = props => {
   }, []);
 
   return (
-    <View style={{height: h(32)}}>
-      <Swiper
-        style={{flex: 1}}
-        currentSelectIndex={0}
-        swipeData={actualData}
-        renderSwipeItem={(item, index) => {
+    // <View style={{height: h(32)}}>
+    <Swiper
+      style={{flex: 1}}
+      currentSelectIndex={0}
+      swipeData={actualData}
+      leftButtonImage={require('../assets/images/backwardIcon.png')}
+      rightButtonImage={require('../assets/images/forwardIcon.png')}
+      //  showSwipeBtn={false}
+      renderSwipeItem={(item, index) => {
+        if (uiType) {
           return (
-            <View style={styles.slide1}>
-                <FastImage
-                  source={{
-                    uri: `https://driverfiles.blob.core.windows.net/driverfiles/${item.image_Url}`,
-                  }}
-                  style={[
-                    styles.flatlistImage,
-                    //  customImageStyle
-                  ]}
-                  resizeMode="cover"
-                />
-                <Text
-                  style={[
-                    styles.area,
-                    //  vehicledetail
-                  ]}>
-                  {item.vehicle_Weight} /{item.other_Specification}/{' '}
-                  {item.vehicle_Type}
-                </Text>
+            <View style={styles.horizontalView}>
+              <FastImage
+                source={{
+                  uri: `https://driverfiles.blob.core.windows.net/driverfiles/${item.image_Url}`,
+                }}
+                style={[
+                  styles.horizontalImage,
+                  //  customImageStyle
+                ]}
+                resizeMode="cover"
+              />
+              <Text
+                style={[
+                  styles.area,
+                  //  vehicledetail
+                ]}>
+                {item.vehicle_Type} {item.other_Specification}{' '}
+                {item.vehicle_Weight}
+              </Text>
             </View>
           );
-        }}
-        onScreenChange={(index)=>onScreenChange(actualData[index])}
-      />
-    </View>
+        } else {
+          return (
+            <View style={styles.slide1}>
+              <FastImage
+                source={{
+                  uri: `https://driverfiles.blob.core.windows.net/driverfiles/${item.image_Url}`,
+                }}
+                style={[
+                  styles.flatlistImage,
+                  //  customImageStyle
+                ]}
+                resizeMode="cover"
+              />
+              <Text
+                style={[
+                  styles.area,
+                  //  vehicledetail
+                ]}>
+                {item.vehicle_Type} /{item.other_Specification}/{' '}
+                {item.vehicle_Weight}
+              </Text>
+            </View>
+          );
+        }
+      }}
+      onScreenChange={index => onScreenChange(actualData[index])}
+    />
+    // </View>
   );
 };
 
 export default VehicleSelection;
 
 const styles = StyleSheet.create({
-  horizontalView: {
-    flexDirection: 'row',
-    flex: 1,
-    marginLeft: w(29),
-  },
   flatlistImage: {
     width: 280,
     height: 130,
     alignSelf: 'center',
     marginVertical: h(3),
   },
-  area: {
-    textAlign:"center"
+  horizontalImage: {
+    width: 180,
+    height: 130,
+    alignSelf: 'center',
+    marginVertical: h(3),
   },
+  area: {},
   wrapper: {},
   slide1: {
     // flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     width: w(100),
+  },
+  horizontalView: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: w(30),
+    flexDirection: 'row',
+    height: h(16),
+  
   },
   slide2: {
     flex: 1,

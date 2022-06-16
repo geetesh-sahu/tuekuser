@@ -2,7 +2,7 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>TukeTuke.ipa</key>
+	<key>TukeDrive.ipa</key>
 	<array>
 		<dict>
 			<key>architectures</key>
@@ -14,31 +14,33 @@
 			<key>certificate</key>
 			<dict>
 				<key>SHA1</key>
-				<string>27CA78D4E2169FCAEC54ED980579FC50C8D1851D</string>
+				<string>DF49C1ADB95E3855C368E4E27BCF38E120479BFE</string>
 				<key>dateExpires</key>
-				<string>16/04/23</string>
+				<string>17/04/23</string>
 				<key>type</key>
 				<string>Apple Development</string>
 			</dict>
 			<key>entitlements</key>
 			<dict>
 				<key>application-identifier</key>
-				<string>63628YKQT7.org.reactjs.native.example.TukeTuke</string>
+				<string>63628YKQT7.org.TukeDrive</string>
+				<key>aps-environment</key>
+				<string>development</string>
 				<key>com.apple.developer.team-identifier</key>
 				<string>63628YKQT7</string>
 				<key>get-task-allow</key>
 				<true/>
 			</dict>
 			<key>name</key>
-			<string>TukeTuke.app</string>
+			<string>TukeDrive.app</string>
 			<key>profile</key>
 			<dict>
 				<key>UUID</key>
-				<string>9402a3a2-47f3-4352-8b2c-7fdc92102388</string>
+				<string>4ea73e11-3dc0-49a3-b370-882f7cec0108</string>
 				<key>dateExpires</key>
-				<string>16/04/23</string>
+				<string>08/06/23</string>
 				<key>name</key>
-				<string>iOS Team Provisioning Profile: *</string>
+				<string>iOS Team Provisioning Profile: org.TukeDrive</string>
 			</dict>
 			<key>team</key>
 			<dict>

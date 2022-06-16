@@ -21,7 +21,8 @@ export const images = {
    vehicle_image:require("../assets/images/vehicleImage.png"),
    clip_board : require("../assets/images/AppIcon98x98.png"),
    flag_image :require('../assets/images/24x24.png'),
-   coupon_icon :require('../assets/images/coupon_icon.png'), 
+   coupon_icon :require('../assets/images/coupon_icon.png'),
+   asyncIcon : require("../assets/images/asyncIcon.png") 
 };
 
 export const colors = {

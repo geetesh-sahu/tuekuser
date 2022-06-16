@@ -2,42 +2,47 @@ import {
   StyleSheet,
   Text,
   View,
-  SafeAreaView,
   TouchableOpacity,
   Image,
   ScrollView,
 } from 'react-native';
 import React, {useState, useEffect, useContext} from 'react';
 import Ionicons from 'react-native-vector-icons/dist/Ionicons';
-import MaterialCommunityIcons from 'react-native-vector-icons/dist/MaterialCommunityIcons';
 import {images} from '../../constants';
-import {fs, h, height, w} from '../../config';
+import {fs, h, w} from '../../config';
 import CommonInputField from '../../components/CommonInputField';
 import CommonBtn from '../../components/CommonBtn';
 import CommonModal from '../../components/CommonModal';
 import VehicleSelection from '../../components/VehicleSelection';
-import {useDispatch, useSelector} from 'react-redux';
-import DateTimePicker, {
-  DateTimePickerAndroid,
-} from '@react-native-community/datetimepicker';
+import {useDispatch} from 'react-redux';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import {OrderContext} from '../../utils/context';
 import moment from 'moment';
 import axios from 'axios';
 import {loader} from '../../redux/actions/loader';
-import {showMessage, hideMessage} from 'react-native-flash-message';
+import {showMessage} from 'react-native-flash-message';
+import Geolocation from 'react-native-geolocation-service';
+import Geocoder from 'react-native-geocoding';
 
 const CurrentLocation = ({navigation}) => {
   const [isModal, setIsModal] = useState(false);
   const [calenderShow, setCalenderShow] = useState(false);
   const [orderData, setOrderData] = useContext(OrderContext);
-  const [opacity, setopacity] = useState(false);
-  const [isIMageOpacity, setisIMageOpacity] = useState(false);
   const [showIcon, setshowIcon] = useState(true);
-  const [changeAddress, setchangeAddress] = useState(true);
-
+  const [currnetloc, setcurrnetloc] = useState('');
+  const [show, setshow] = useState(true);
+  const [confirm, setconfirm] = useState(false);
   const dispatch = useDispatch();
 
   const [date, setDate] = useState(new Date());
+
+  useEffect(() => {
+    getCurrentLocation();
+  }, []);
+
+  console.log('currenlocaiton inm ordata', orderData);
+
+  Geocoder.init('AIzaSyBzhsIqqHLkDrRiSqt94pxHJCdHHXgA464');
 
   const onChange = (event, selectedDate) => {
     setCalenderShow(false);
@@ -54,6 +59,85 @@ const CurrentLocation = ({navigation}) => {
   const closeModalHandler = item => {
     setIsModal(item);
     setshowIcon(true);
+  };
+
+  function getAddressObject(lat, lng, formatAddress, address_components) {
+    var ShouldBeComponent = {
+      home: ['street_number'],
+      postal_code: ['postal_code'],
+      street: ['street_address', 'route'],
+      region: [
+        'administrative_area_level_1',
+        'administrative_area_level_2',
+        'administrative_area_level_3',
+        'administrative_area_level_4',
+        'administrative_area_level_5',
+      ],
+      city: [
+        'locality',
+        'sublocality',
+        'sublocality_level_1',
+        'sublocality_level_2',
+        'sublocality_level_3',
+        'sublocality_level_4',
+      ],
+      country: ['country'],
+    };
+    var address = {
+      home: '',
+      postal_code: '',
+      street: '',
+      region: '',
+      city: '',
+      country: '',
+    };
+    address_components.forEach(component => {
+      for (var shouldBe in ShouldBeComponent) {
+        if (ShouldBeComponent[shouldBe].indexOf(component.types[0]) !== -1) {
+          address[shouldBe] = component.long_name;
+        }
+      }
+    });
+    return address;
+  }
+
+  const getCurrentLocation = () => {
+    Geolocation.getCurrentPosition(
+      position => {
+        console.log(
+          'lat, lng',
+          position.coords.latitude,
+          position.coords.longitude,
+        );
+        Geocoder.from(position.coords.latitude, position.coords.longitude)
+          .then(async json => {
+            console.log('json- -- >>', json.results);
+            const addressComponent = json.results[0].address_components;
+            const addresCurrent = addressComponent[1].long_name;
+
+            const address = getAddressObject(
+              position.coords.latitude,
+              position.coords.longitude,
+              addresCurrent,
+              addressComponent,
+            );
+            setcurrnetloc(address);
+            setOrderData({
+              ...orderData,
+              pick_City: address.city,
+              Pick_Late: position.coords.latitude,
+              Pick_Long: position.coords.longitude,
+              pick_Location: address.street ? address.street : address.city,
+              pick_Address: addresCurrent ? addresCurrent : address.city,
+            });
+          })
+          .catch(error => console.log('error===>>', error));
+      },
+      error => {
+        console.log('error', error.code, error.message);
+      },
+      {enableHighAccuracy: false, timeout: 5000, maximumAge: 10000},
+    );
   };
 
   const validationForOnSubmitHandler = () => {
@@ -107,55 +191,53 @@ const CurrentLocation = ({navigation}) => {
     return true;
   };
 
+  console.log('current--->>loc', currnetloc);
+
   const onSubmitHandler = () => {
-    const valid = validationForOnSubmitHandler();
-    if (valid) {
-      dispatch(loader(true));
-      axios
-        .post(
-          'http://tuketuke.azurewebsites.net/api/OrderDetails/GetDistancebyAPI',
-          {
-            pick_Lat: orderData.Pick_Late,
-            pick_lng: orderData.Pick_Long,
-            destination_Lat: orderData.destination_Late,
-            destination_Lng: orderData.destination_Long,
+    dispatch(loader(true));
+    axios
+      .post(
+        'http://tuketuke.azurewebsites.net/api/OrderDetails/GetDistancebyAPI',
+        {
+          pick_Lat: orderData.Pick_Late,
+          pick_lng: orderData.Pick_Long,
+          destination_Lat: orderData.destination_Late,
+          destination_Lng: orderData.destination_Long,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
           },
-          {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          },
-        )
-        .then(async function (response) {
-          console.log('GetDistancebyAPI====>>>--', response.data);
-          if (response.status == 200) {
-            if (response.data.status == 'Success') {
-              await setOrderData({
-                ...orderData,
-                estimated_Cost: response.data.data.amount,
-                distance: response.data.data.distance,
-              });
-              dispatch(loader(false));
-              navigation.navigate('SelectVehicle');
-            } else {
-              dispatch(loader(false));
-            }
+        },
+      )
+      .then(async function (response) {
+        console.log('CurrentLocation====>>>--', response.data);
+        if (response.status == 200) {
+          if (response.data.status == 'Success') {
+            await setOrderData({
+              ...orderData,
+              estimated_Cost: response.data.data.amount,
+              distance: response.data.data.distance,
+            });
+            dispatch(loader(false));
+            navigation.navigate('SelectVehicle');
           } else {
             dispatch(loader(false));
           }
-        })
-        .catch(function (error) {
-          showMessage({
-            message: error.toString(),
-            type: 'warning',
-          });
+        } else {
           dispatch(loader(false));
+        }
+      })
+      .catch(function (error) {
+        showMessage({
+          message: error.toString(),
+          type: 'warning',
         });
-    }
+        dispatch(loader(false));
+      });
   };
 
   const exachangeAddressHandler = () => {
-    // setchangeAddress(!changeAddress);
     setOrderData({
       ...orderData,
       Pick_Late: orderData.destination_Late,
@@ -171,13 +253,21 @@ const CurrentLocation = ({navigation}) => {
     });
   };
 
+  const showTime = () => {
+    setCalenderShow(true);
+    setshow(false);
+  };
+
+  const onConfirmHandler = () => {
+    const valid = validationForOnSubmitHandler();
+    if (valid) {
+      setconfirm(true);
+    }
+  };
+
   return (
-    <SafeAreaView
-      style={{
-        flex: 1,
-        backgroundColor: 'lightgrey',
-      }}>
-      <ScrollView>
+    <View style={{flex: 1}}>
+      <View style={{flex: 1}}>
         <View style={styles.container1}>
           <View style={styles.cityName}>
             <Ionicons name="location-sharp" size={22} color="grey" />
@@ -186,90 +276,124 @@ const CurrentLocation = ({navigation}) => {
           {showIcon ? (
             <TouchableOpacity
               style={styles.menuIconView}
-              onPress={modalHandler}>
+              onPress={() => modalHandler()}>
               <View style={styles.square} />
               <View style={[styles.square, {marginHorizontal: h(0.7)}]} />
               <View style={styles.square} />
             </TouchableOpacity>
           ) : null}
         </View>
-        <View style={styles.container2}>
-          <View style={styles.locatinDetail}>
+      </View>
+      <View style={{flex: 12, backgroundColor: 'white', marginTop: h(2),borderTopLeftRadius:fs(19),borderTopEndRadius:fs(19)}}>
+        <ScrollView>
+          <TouchableOpacity  style={styles.locatinDetail} onPress={showTime}>
             <Text>Pick up time </Text>
             <View style={styles.horizontalView}>
-              <Text style={styles.nowText}>
-                {orderData.pickup_Date &&
-                  moment(orderData.pickup_Date).format('MMMM Do YYYY, h:mm a')}
-              </Text>
-              <TouchableOpacity
-                onPress={() => {
-                  setCalenderShow(true);
-                }}>
+              {show ? (
+                <Text style={styles.nowText}>Now</Text>
+              ) : (
+                <Text style={styles.nowText}>
+                  {orderData.pickup_Date &&
+                    moment(orderData.pickup_Date).format(
+                      'MMMM Do YYYY, h:mm a',
+                    )}
+                </Text>
+              )}
+
+              <View >
                 <Ionicons name="chevron-forward" size={26} color="grey" />
-              </TouchableOpacity>
+              </View>
             </View>
-          </View>
+          </TouchableOpacity>
           <View
             style={{
               borderBottomColor: 'lightgrey',
-              borderBottomWidth: 2,
+              borderBottomWidth: 1,
             }}
           />
-
-          <TouchableOpacity
-            onPress={() => navigation.navigate('PickupLocation')}
-            style={styles.pikupLoc}>
-            <Ionicons name="ios-location-outline" size={22} color="grey" />
-            <View style={styles.location}>
-              <View style={styles.currentAddress}>
-                <Text>Current pick up location</Text>
-
+          <View
+            style={{flexDirection: 'row', paddingVertical: 15, height: h(18)}}>
+            <View
+              style={{
+                flex: 0.8,
+                marginTop: h(0.4),
+                alignItems: 'center',
+              }}>
+              <Ionicons name="ios-location-outline" size={22} color="grey" />
+            </View>
+            <View style={{flex: 4.4}}>
+              <Text>Current pick up location</Text>
+              {orderData.Pick_Late !== '' && (
                 <View>
                   <Text style={styles.placeName}>{orderData.pick_City}</Text>
                   <Text>{`${orderData.pick_Location} ${orderData.pick_Address}`}</Text>
                 </View>
-              </View>
-              <TouchableOpacity>
-                <Ionicons name="chevron-forward" size={26} color="grey" />
-              </TouchableOpacity>
+              )}
             </View>
-          </TouchableOpacity>
-          <View style={styles.refreshView}>
-            <View style={styles.length} />
             <TouchableOpacity
-              style={{transform: [{rotate: '40deg'}]}}
-              onPress={exachangeAddressHandler}>
-              <MaterialCommunityIcons name="sync" size={30} color="black" />
+              style={{
+                flex: 0.8,
+                justifyContent: 'center',
+              }}
+              onPress={() =>
+                navigation.navigate('PickupLocation', {
+                  ulocation: 'Pickup address',
+                })
+              }>
+              <Ionicons name="chevron-forward" size={26} color="grey" />
             </TouchableOpacity>
-            <View style={styles.length} />
+          </View>
+
+          <View style={styles.refreshView}>
+          
+            <TouchableOpacity onPress={exachangeAddressHandler}>
+              <Image source={images.asyncIcon} />
+            </TouchableOpacity>
+           
           </View>
 
           {orderData.destination_Location == '' ? (
             <CommonInputField
-              onFocus={() => navigation.navigate('PickupLocation')}
+              onFocus={() =>
+                navigation.navigate('PickupLocation', {
+                  ulocation: 'Destination address',
+                })
+              }
               placeholder="Enter destination address"
               inputStyle={styles.inputView}
             />
           ) : (
-            <View style={styles.destinationStyle}>
-              <Image source={images.flag_image} style={{marginLeft: w(2)}} />
-              <TouchableOpacity
-                style={styles.location}
-                onPress={() => navigation.navigate('PickupLocation')}>
-                <View style={styles.dAddress}>
-                  <Text>Destination address</Text>
+            <View>
+              <View style={styles.destinationStyle}>
+                <Image source={images.flag_image} style={{marginTop: h(0.7)}} />
+                <View style={styles.location}>
+                  <View style={styles.dAddress}>
+                    <Text>Destination address</Text>
 
-                  <View>
-                    <Text style={styles.placeName}>
-                      {orderData.destination_Address}
-                    </Text>
-                    <Text>{orderData.destination_Location}</Text>
+                    <View>
+                      <Text style={styles.placeName}>
+                        {orderData.destination_Address}
+                      </Text>
+                      <Text>{orderData.destination_Location}</Text>
+                    </View>
                   </View>
+                  <TouchableOpacity
+                    style={{justifyContent: 'center'}}
+                    onPress={() =>
+                      navigation.navigate('PickupLocation', {
+                        ulocation: 'Destination Address',
+                      })
+                    }>
+                    <Ionicons name="chevron-forward" size={26} color="grey" />
+                  </TouchableOpacity>
                 </View>
-                <TouchableOpacity>
-                  <Ionicons name="chevron-forward" size={26} color="grey" />
-                </TouchableOpacity>
-              </TouchableOpacity>
+              </View>
+              <View
+                style={{
+                  borderBottomColor: 'lightgrey',
+                  borderBottomWidth: 1,
+                }}
+              />
             </View>
           )}
 
@@ -278,6 +402,7 @@ const CurrentLocation = ({navigation}) => {
             onScreenChange={(item, index) => {
               setOrderData({...orderData, vehicle_ID: item.id});
             }}
+           
           />
           {isModal && (
             <CommonModal
@@ -286,20 +411,23 @@ const CurrentLocation = ({navigation}) => {
               modalCallback={closeModalHandler}
             />
           )}
-          <View style={styles.confirmBtnView}>
-            {/* <CommonBtn
+        </ScrollView>
+      </View>
+      <View style={{flex: 1}}>
+        {confirm ? (
+          <CommonBtn
+            text="Next"
+            customBtnStyle={styles.confirmBtn}
+            onPress={onSubmitHandler}
+          />
+        ) : (
+          <CommonBtn
             text="Confirm"
             customBtnStyle={styles.confirmBtn}
-            onPress={modalHandler}
-          /> */}
-            <CommonBtn
-              text="Next"
-              customBtnStyle={styles.confirmBtn}
-              onPress={onSubmitHandler}
-            />
-          </View>
-        </View>
-      </ScrollView>
+            onPress={onConfirmHandler}
+          />
+        )}
+      </View>
       {calenderShow && (
         <DateTimePicker
           testID="dateTimePicker"
@@ -309,7 +437,7 @@ const CurrentLocation = ({navigation}) => {
           onChange={onChange}
         />
       )}
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -317,11 +445,11 @@ export default CurrentLocation;
 
 const styles = StyleSheet.create({
   container1: {
-    marginHorizontal: w(3),
-    marginTop: h(1),
+    flex: 1,
+    paddingHorizontal: w(3),
+    paddingTop: h(2),
     flexDirection: 'row',
     alignItems: 'center',
-    height: h(7),
   },
   cityName: {
     flex: 1,
@@ -329,9 +457,9 @@ const styles = StyleSheet.create({
   },
   menuIconView: {
     flexDirection: 'row',
-    height: 50,
-    width: 50,
-    borderRadius: 50,
+    height: w(11),
+    width: w(11),
+    borderRadius: w(12),
     backgroundColor: 'white',
     alignItems: 'center',
     justifyContent: 'center',
@@ -339,14 +467,11 @@ const styles = StyleSheet.create({
   },
   square: {
     backgroundColor: 'grey',
-    width: 8,
-    height: 8,
+    width: w(1.5),
+    height: w(1.5),
   },
   container2: {
-    backgroundColor: 'white',
-    flex: 1,
-    marginTop: h(1),
-    borderRadius: 19,
+    flex: 9,
   },
   locatinDetail: {
     padding: w(5),
@@ -367,12 +492,12 @@ const styles = StyleSheet.create({
   confirmBtnView: {
     flex: 1,
     justifyContent: 'flex-end',
+    marginTop: h(4),
   },
   confirmBtn: {
     borderRadius: 0,
     width: w(100),
     height: h(8),
-    marginTop: h(2),
   },
 
   area: {
@@ -388,14 +513,13 @@ const styles = StyleSheet.create({
     marginTop: h(5),
   },
   inputView: {
-    marginTop: h(8),
+    marginTop: h(5),
     height: h(8),
     width: w(94),
-    backgroundColor: 'lightgrey',
   },
   length: {
     borderBottomColor: 'lightgrey',
-    borderBottomWidth: 2,
+    borderBottomWidth: 1,
     width: '50%',
   },
   refreshView: {
@@ -409,27 +533,16 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   location: {
-    alignItems: 'center',
     flexDirection: 'row',
   },
-  pikupLoc: {
-    flexDirection: 'row',
-    padding: w(5),
-    justifyContent: 'space-between',
-    height: h(16),
-  },
+
   destinationStyle: {
     flexDirection: 'row',
-    padding: w(5),
-    justifyContent: 'space-between',
-    height: h(16),
+    height: h(18),
+    paddingHorizontal: w(3),
   },
   dAddress: {
-    marginRight: w(2),
-    width: w(67),
-  },
-  currentAddress: {
-    marginRight: w(2),
-    width: w(67),
+    width: w(74),
+    marginLeft: w(2.3),
   },
 });

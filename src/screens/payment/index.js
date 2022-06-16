@@ -16,13 +16,15 @@ import {useDispatch} from 'react-redux';
 import {loader} from '../../redux/actions/loader';
 import axios from 'axios';
 
-
 const Payment = ({navigation}) => {
   const [orderData, setOrderData] = useContext(OrderContext);
   const [a, setA] = useState(false);
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
+
+
 
   const onSuccessHandler = res => {
+    console.log('resss===>>', res.data.transactionRef.status);
     setA(false);
     dispatch(loader(true));
     axios
@@ -35,7 +37,7 @@ const Payment = ({navigation}) => {
           transaction: res.data.transactionRef.transaction,
           reference: res.data.transactionRef.reference,
           order_No: 2,
-          amount: orderData.estimated_Cost,
+          amount: 265,
         },
         {
           headers: {
@@ -44,7 +46,7 @@ const Payment = ({navigation}) => {
         },
       )
       .then(function (response) {
-
+        console.log('resposne payment===>>', response.data);
         if (response.status == 200) {
           if (response.data.status == 'Success') {
             dispatch(loader(false));
@@ -69,7 +71,7 @@ const Payment = ({navigation}) => {
         showLine={true}
       />
       <View style={styles.walletBox}>
-        <Text style={styles.amountStyle}>$ 5,000</Text>
+        <Text style={styles.amountStyle}>$ 0</Text>
         <Text style={styles.walletText}>Wallet</Text>
       </View>
 
