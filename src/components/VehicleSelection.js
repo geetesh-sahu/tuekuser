@@ -55,20 +55,20 @@ const VehicleSelection = props => {
         } else {
           return (
             <View style={styles.slide1}>
+               <Text style={styles.slide}>Slide to select vehicle</Text>
               <FastImage
                 source={{
                   uri: `https://driverfiles.blob.core.windows.net/driverfiles/${item.image_Url}`,
                 }}
                 style={[
                   styles.flatlistImage,
-                  //  customImageStyle
+               
                 ]}
                 resizeMode="cover"
               />
               <Text
                 style={[
                   styles.area,
-                  //  vehicledetail
                 ]}>
                 {item.vehicle_Type} /{item.other_Specification}/{' '}
                 {item.vehicle_Weight}
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     width: 280,
     height: 130,
     alignSelf: 'center',
-    marginVertical: h(3),
+    marginVertical: h(1),
   },
   horizontalImage: {
     width: 180,
@@ -101,10 +101,11 @@ const styles = StyleSheet.create({
   area: {},
   wrapper: {},
   slide1: {
-    // flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
-    width: w(100),
+   
+    width:'100%',
+    height:300,
+    justifyContent:'center'
   },
   horizontalView: {
     justifyContent: 'center',
@@ -112,7 +113,7 @@ const styles = StyleSheet.create({
     width: w(30),
     flexDirection: 'row',
     height: h(16),
-  
+    marginRight: w(3),
   },
   slide2: {
     flex: 1,

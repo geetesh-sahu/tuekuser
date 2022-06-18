@@ -11,7 +11,6 @@ const MapRowItem = props => {
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
-        
       }}>
       <View style={{flexDirection: 'row',alignItems:'center'}}>
         <View style={{flex: 1}}>

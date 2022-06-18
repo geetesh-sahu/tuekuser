@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import React, {useState, useEffect, useContext} from 'react';
 import Ionicons from 'react-native-vector-icons/dist/Ionicons';
+import AntDesign from 'react-native-vector-icons/dist/AntDesign';
 import {images} from '../../constants';
 import {fs, h, w} from '../../config';
 import CommonInputField from '../../components/CommonInputField';
@@ -32,19 +33,18 @@ const CurrentLocation = ({navigation}) => {
   const [currnetloc, setcurrnetloc] = useState('');
   const [show, setshow] = useState(true);
   const [confirm, setconfirm] = useState(false);
-  const dispatch = useDispatch();
-
+  const [dateTime, setdateTime] = useState("date")
   const [date, setDate] = useState(new Date());
+  const dispatch = useDispatch();
 
   useEffect(() => {
     getCurrentLocation();
   }, []);
 
-  console.log('currenlocaiton inm ordata', orderData);
-
   Geocoder.init('AIzaSyBzhsIqqHLkDrRiSqt94pxHJCdHHXgA464');
 
   const onChange = (event, selectedDate) => {
+    setdateTime('date')
     setCalenderShow(false);
     const date = moment(selectedDate).format();
     setDate(selectedDate);
@@ -111,7 +111,6 @@ const CurrentLocation = ({navigation}) => {
         );
         Geocoder.from(position.coords.latitude, position.coords.longitude)
           .then(async json => {
-            console.log('json- -- >>', json.results);
             const addressComponent = json.results[0].address_components;
             const addresCurrent = addressComponent[1].long_name;
 
@@ -141,20 +140,20 @@ const CurrentLocation = ({navigation}) => {
   };
 
   const validationForOnSubmitHandler = () => {
-    if (orderData.pickup_Date == '') {
-      showMessage({
-        message: 'Please select date',
-        type: 'warning',
-      });
-      return false;
-    }
-    if (orderData.pickup_Time == '') {
-      showMessage({
-        message: 'Please select date',
-        type: 'warning',
-      });
-      return false;
-    }
+    // if (orderData.pickup_Date == '') {
+    //   showMessage({
+    //     message: 'Please select date',
+    //     type: 'warning',
+    //   });
+    //   return false;
+    // }
+    // if (orderData.pickup_Time == '') {
+    //   showMessage({
+    //     message: 'Please select date',
+    //     type: 'warning',
+    //   });
+    //   return false;
+    // }
     if (
       orderData.Pick_Late == '' ||
       orderData.Pick_Long == '' ||
@@ -191,9 +190,15 @@ const CurrentLocation = ({navigation}) => {
     return true;
   };
 
-  console.log('current--->>loc', currnetloc);
 
   const onSubmitHandler = () => {
+    if(orderData.pick_Address==orderData.destination_Address){
+      showMessage({
+        message: "address should not be same",
+        type: "danger",
+      });
+    }else{
+   
     dispatch(loader(true));
     axios
       .post(
@@ -211,11 +216,11 @@ const CurrentLocation = ({navigation}) => {
         },
       )
       .then(async function (response) {
-        console.log('CurrentLocation====>>>--', response.data);
         if (response.status == 200) {
           if (response.data.status == 'Success') {
             await setOrderData({
               ...orderData,
+              pickup_Date: moment(date).format(), pickup_Time: moment(date).format(),
               estimated_Cost: response.data.data.amount,
               distance: response.data.data.distance,
             });
@@ -235,22 +240,31 @@ const CurrentLocation = ({navigation}) => {
         });
         dispatch(loader(false));
       });
+    }
   };
 
   const exachangeAddressHandler = () => {
-    setOrderData({
-      ...orderData,
-      Pick_Late: orderData.destination_Late,
-      Pick_Long: orderData.destination_Long,
-      pick_Location: orderData.destination_Location,
-      pick_Address: orderData.destination_Address,
-      pick_City: orderData.destiNation_City,
-      destination_Late: orderData.Pick_Late,
-      destination_Long: orderData.Pick_Long,
-      destiNation_City: orderData.pick_City,
-      destination_Address: orderData.pick_Address,
-      destination_Location: orderData.pick_Location,
-    });
+    if(orderData.destination_Location == ''){
+      showMessage({
+        message: "please enter destination address",
+        type: 'warning',
+      });
+    }else{
+      setOrderData({
+        ...orderData,
+        Pick_Late: orderData.destination_Late,
+        Pick_Long: orderData.destination_Long,
+        pick_Location: orderData.destination_Location,
+        pick_Address: orderData.destination_Address,
+        pick_City: orderData.destiNation_City,
+        destination_Late: orderData.Pick_Late,
+        destination_Long: orderData.Pick_Long,
+        destiNation_City: orderData.pick_City,
+        destination_Address: orderData.pick_Address,
+        destination_Location: orderData.pick_Location,
+      })
+    }
+   
   };
 
   const showTime = () => {
@@ -268,25 +282,47 @@ const CurrentLocation = ({navigation}) => {
   return (
     <View style={{flex: 1}}>
       <View style={{flex: 1}}>
-        <View style={styles.container1}>
-          <View style={styles.cityName}>
-            <Ionicons name="location-sharp" size={22} color="grey" />
-            <Text>{orderData.pick_City}</Text>
-          </View>
-          {showIcon ? (
-            <TouchableOpacity
-              style={styles.menuIconView}
-              onPress={() => modalHandler()}>
+        {orderData.destination_Location == '' ? (
+          <View style={styles.container1}>
+            <View style={styles.cityName}>
+              <Ionicons name="location-sharp" size={22} color="grey" />
+              <Text>{orderData.pick_City}</Text>
+            </View>
+
+            <TouchableOpacity style={styles.menuIconView}>
               <View style={styles.square} />
               <View style={[styles.square, {marginHorizontal: h(0.7)}]} />
               <View style={styles.square} />
             </TouchableOpacity>
-          ) : null}
-        </View>
+          </View>
+        ) : (
+          <>
+            {showIcon ? (
+              <TouchableOpacity
+                style={{backgroundColor: 'white', flex: 1}}
+                onPress={() => modalHandler()}>
+                <AntDesign
+                  name="pluscircle"
+                  size={32}
+                  color="grey"
+                  style={{
+                    marginTop: h(3),
+                    alignSelf: 'flex-end',
+                    marginRight: w(6),
+                  }}
+                />
+              </TouchableOpacity>
+            ) : null}
+          </>
+        )}
       </View>
-      <View style={{flex: 12, backgroundColor: 'white', marginTop: h(2),borderTopLeftRadius:fs(19),borderTopEndRadius:fs(19)}}>
+      <View
+        style={{
+          flex: 10,
+          backgroundColor: 'white',
+        }}>
         <ScrollView>
-          <TouchableOpacity  style={styles.locatinDetail} onPress={showTime}>
+          <TouchableOpacity style={styles.locatinDetail} onPress={showTime}>
             <Text>Pick up time </Text>
             <View style={styles.horizontalView}>
               {show ? (
@@ -300,7 +336,7 @@ const CurrentLocation = ({navigation}) => {
                 </Text>
               )}
 
-              <View >
+              <View>
                 <Ionicons name="chevron-forward" size={26} color="grey" />
               </View>
             </View>
@@ -311,70 +347,101 @@ const CurrentLocation = ({navigation}) => {
               borderBottomWidth: 1,
             }}
           />
-          <View
-            style={{flexDirection: 'row', paddingVertical: 15, height: h(18)}}>
+
+          <View style={{flexDirection: 'row', marginTop: h(2)}}>
             <View
               style={{
-                flex: 0.8,
-                marginTop: h(0.4),
+                marginLeft: w(4),
+                width: 20,
                 alignItems: 'center',
+                height: h(37),
               }}>
               <Ionicons name="ios-location-outline" size={22} color="grey" />
-            </View>
-            <View style={{flex: 4.4}}>
-              <Text>Current pick up location</Text>
-              {orderData.Pick_Late !== '' && (
-                <View>
-                  <Text style={styles.placeName}>{orderData.pick_City}</Text>
-                  <Text>{`${orderData.pick_Location} ${orderData.pick_Address}`}</Text>
+
+              {orderData.destination_Location == '' ? null : (
+                <View style={{alignItems: 'center'}}>
+                  <View
+                    style={{height: h(1), width: 1, backgroundColor: 'black'}}
+                  />
+                  <View
+                    style={{
+                      height: 5,
+                      width: 5,
+                      borderRadius: 5 / 2,
+                      backgroundColor: 'black',
+                    }}
+                  />
+                  <View
+                    style={{height: h(15), width: 1, backgroundColor: 'black'}}
+                  />
+                  <View
+                    style={{
+                      height: 5,
+                      width: 5,
+                      borderRadius: 5 / 2,
+                      backgroundColor: 'black',
+                    }}
+                  />
+                  <View
+                    style={{height: '6%', width: 1, backgroundColor: 'black'}}
+                  />
+                  <Image source={images.flag_image} style={{}} />
                 </View>
               )}
             </View>
-            <TouchableOpacity
-              style={{
-                flex: 0.8,
-                justifyContent: 'center',
-              }}
-              onPress={() =>
-                navigation.navigate('PickupLocation', {
-                  ulocation: 'Pickup address',
-                })
-              }>
-              <Ionicons name="chevron-forward" size={26} color="grey" />
-            </TouchableOpacity>
-          </View>
 
-          <View style={styles.refreshView}>
-          
-            <TouchableOpacity onPress={exachangeAddressHandler}>
-              <Image source={images.asyncIcon} />
-            </TouchableOpacity>
-           
-          </View>
-
-          {orderData.destination_Location == '' ? (
-            <CommonInputField
-              onFocus={() =>
-                navigation.navigate('PickupLocation', {
-                  ulocation: 'Destination address',
-                })
-              }
-              placeholder="Enter destination address"
-              inputStyle={styles.inputView}
-            />
-          ) : (
-            <View>
+            <View style={{width: '100%', marginLeft: w(3)}}>
               <View style={styles.destinationStyle}>
-                <Image source={images.flag_image} style={{marginTop: h(0.7)}} />
-                <View style={styles.location}>
+                <View style={styles.dAddress}>
+                  <View>
+                    <Text>Current pick up location</Text>
+                    {orderData.Pick_Late !== '' && (
+                      <View>
+                        <Text style={styles.placeName}>
+                          {orderData.pick_City}
+                        </Text>
+                        <Text>{`${orderData.pick_Address}`}</Text>
+                      </View>
+                    )}
+                  </View>
+                </View>
+                <TouchableOpacity
+                  style={{
+                    justifyContent: 'center',
+                  }}
+                  onPress={() =>
+                    navigation.navigate('PickupLocation', {
+                      ulocation: 'Pickup address',
+                    })
+                  }>
+                  <Ionicons name="chevron-forward" size={26} color="grey" />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.refreshView}>
+                <TouchableOpacity onPress={exachangeAddressHandler}  >
+                  <Image source={images.asyncIcon} />
+                </TouchableOpacity>
+              </View>
+              {orderData.destination_Location == '' ? (
+                <CommonInputField
+                  onFocus={() =>
+                    navigation.navigate('PickupLocation', {
+                      ulocation: 'Destination address',
+                    })
+                  }
+                  placeholder="Enter destination address"
+                  inputStyle={styles.inputView}
+                />
+              ) : (
+                <View style={styles.destinationStyle}>
                   <View style={styles.dAddress}>
                     <Text>Destination address</Text>
-
                     <View>
                       <Text style={styles.placeName}>
-                        {orderData.destination_Address}
+                       
+                        {orderData.destination_Location}
                       </Text>
-                      <Text>{orderData.destination_Location}</Text>
+                      <Text> {orderData.destination_Address}</Text>
                     </View>
                   </View>
                   <TouchableOpacity
@@ -387,23 +454,26 @@ const CurrentLocation = ({navigation}) => {
                     <Ionicons name="chevron-forward" size={26} color="grey" />
                   </TouchableOpacity>
                 </View>
-              </View>
-              <View
-                style={{
-                  borderBottomColor: 'lightgrey',
-                  borderBottomWidth: 1,
-                }}
-              />
+              )}
             </View>
+          </View>
+          {orderData.destination_Location == '' ? null : (
+            <View
+              style={{
+                borderBottomColor: 'lightgrey',
+                borderBottomWidth: 1,
+                marginTop: h(1.5),
+              }}
+            />
           )}
 
-          <Text style={styles.slide}>Slide to select vehicle</Text>
-          <VehicleSelection
-            onScreenChange={(item, index) => {
-              setOrderData({...orderData, vehicle_ID: item.id});
-            }}
-           
-          />
+          <View style={{flex: 1}}>
+            <VehicleSelection
+              onScreenChange={(item, index) => {
+                setOrderData({...orderData, vehicle_ID: item.id});
+              }}
+            />
+          </View>
           {isModal && (
             <CommonModal
               showModal={isModal}
@@ -413,18 +483,18 @@ const CurrentLocation = ({navigation}) => {
           )}
         </ScrollView>
       </View>
-      <View style={{flex: 1}}>
-        {confirm ? (
-          <CommonBtn
-            text="Next"
-            customBtnStyle={styles.confirmBtn}
-            onPress={onSubmitHandler}
-          />
-        ) : (
+      <View style={{flex: 0.91}}>
+        {orderData.destination_Location == '' ? (
           <CommonBtn
             text="Confirm"
             customBtnStyle={styles.confirmBtn}
             onPress={onConfirmHandler}
+          />
+        ) : (
+          <CommonBtn
+            text="Next"
+            customBtnStyle={styles.confirmBtn}
+            onPress={onSubmitHandler}
           />
         )}
       </View>
@@ -432,7 +502,7 @@ const CurrentLocation = ({navigation}) => {
         <DateTimePicker
           testID="dateTimePicker"
           value={date}
-          mode={'datetime'}
+          mode={dateTime}
           is24Hour={false}
           onChange={onChange}
         />
@@ -447,7 +517,7 @@ const styles = StyleSheet.create({
   container1: {
     flex: 1,
     paddingHorizontal: w(3),
-    paddingTop: h(2),
+    paddingTop: h(1),
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -457,27 +527,28 @@ const styles = StyleSheet.create({
   },
   menuIconView: {
     flexDirection: 'row',
-    height: w(11),
-    width: w(11),
+    height: w(10),
+    width: w(10),
     borderRadius: w(12),
     backgroundColor: 'white',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: w(1),
+    marginRight: w(2),
   },
   square: {
     backgroundColor: 'grey',
-    width: w(1.5),
-    height: w(1.5),
+    width: w(1.2),
+    height: w(1.2),
   },
   container2: {
     flex: 9,
   },
   locatinDetail: {
-    padding: w(5),
+    paddingHorizontal: w(5.5),
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    paddingVertical: h(2),
   },
   nowText: {
     color: 'black',
@@ -510,12 +581,12 @@ const styles = StyleSheet.create({
   },
   slide: {
     alignSelf: 'center',
-    marginTop: h(5),
   },
   inputView: {
-    marginTop: h(5),
+    marginTop: h(3),
     height: h(8),
-    width: w(94),
+    width: w(95),
+    marginRight: w(25),
   },
   length: {
     borderBottomColor: 'lightgrey',
@@ -523,26 +594,21 @@ const styles = StyleSheet.create({
     width: '50%',
   },
   refreshView: {
-    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    marginBottom: h(4),
+    marginRight: w(15),
   },
   placeName: {
     fontSize: fs(18),
     color: 'black',
     fontWeight: 'bold',
   },
-  location: {
-    flexDirection: 'row',
-  },
 
   destinationStyle: {
     flexDirection: 'row',
-    height: h(18),
-    paddingHorizontal: w(3),
+    height: h(14),
   },
   dAddress: {
-    width: w(74),
-    marginLeft: w(2.3),
+    width: w(75),
   },
 });

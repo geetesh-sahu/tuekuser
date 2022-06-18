@@ -177,37 +177,13 @@ import BottomContainer from '../../components/BottomContainer';
 import ImageContainer from '../../components/ImageContainer';
 import { LoadingAtom } from '../../components/LoadingAtom';
 
-const Completed = (props) => {
-  const [scrollY, setScrollY] = useState(new Animated.Value(0));
-  const imageSource = 'https://images.unsplash.com/photo-1591187194794-1860cc81437c';
-  const placeHolderContent = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+const Completed = ({navigation}) => {
+
   return (
     <View style={[styles.container]}>
      
       <SafeAreaView>
-        <ImageContainer
-          scrollY={scrollY}
-          imageSource={imageSource}
-          imageHeight={450}
-        />
-        <BottomContainer
-          scrollY={scrollY}
-          imageHeight={450}
-        >
-          <View style={{
-            marginTop: 40,
-            marginLeft: 20,
-            marginRight: 20,
-            display: 'flex',
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            justifyContent: 'space-around',
-          }}>
-            {/* {
-              placeHolderContent.map((item, index) => <LoadingAtom key={item} />)
-            } */}
-          </View>
-        </BottomContainer>
+        <ImageContainer  navigation={navigation}    />
       </SafeAreaView>
     </View>
   )

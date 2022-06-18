@@ -33,6 +33,8 @@ import FeedBack from '../screens/feedBack';
 import {AuthContext, UserContext} from '../utils/context';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import {useSelector} from 'react-redux';
+import DriverDetials from '../screens/driverDetails';
+
 
 const Stack = createNativeStackNavigator();
 const Auth = createNativeStackNavigator();
@@ -102,7 +104,7 @@ const StackNavigation = () => {
   );
 
   return (
-    <AuthContext.Provider value={authContext}>
+    <AuthContext.Provider value={authContext}> 
       <NavigationContainer>
         <Stack.Navigator screenOptions={{headerShown: false}}>
           {state.isLoading ? (
@@ -144,6 +146,9 @@ const StackNavigation = () => {
               <Stack.Screen name="FeedBack" component={FeedBack} />
             </>
           )}
+        <Stack.Group screenOptions={{presentation: 'modal'}}>
+             <Stack.Screen name="DriverDetials" component={DriverDetials} />
+        </Stack.Group>
         </Stack.Navigator>
         {loading && (
           <ActivityIndicator

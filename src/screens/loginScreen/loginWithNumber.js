@@ -29,7 +29,7 @@ const LoginWithNumber = ({navigation}) => {
       </View>
       <CommonBtn
         text="Login with this number"
-        onPress={() => navigation.navigate('OtpScreen')}
+        // onPress={() => navigation.navigate('CurrentLocation')}
         customBtnStyle={styles.loginBtn}
       />
       <TouchableOpacity onPress={() => navigation.navigate('LoginScreen')}>

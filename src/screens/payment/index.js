@@ -24,7 +24,6 @@ const Payment = ({navigation}) => {
 
 
   const onSuccessHandler = res => {
-    console.log('resss===>>', res.data.transactionRef.status);
     setA(false);
     dispatch(loader(true));
     axios
@@ -46,7 +45,6 @@ const Payment = ({navigation}) => {
         },
       )
       .then(function (response) {
-        console.log('resposne payment===>>', response.data);
         if (response.status == 200) {
           if (response.data.status == 'Success') {
             dispatch(loader(false));

@@ -188,25 +188,6 @@ const Map = ({navigation}) => {
     }, 5000);
   }, []);
 
-  const getCurrentLocation = () =>
-    new Promise((resolve, reject) => {
-      Geolocation.getCurrentPosition(
-        position => {
-          const cords = {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            heading: position?.coords?.heading,
-          };
-
-          resolve(cords);
-        },
-        error => {
-          reject(error.message);
-        },
-        {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
-      );
-    });
-
   const mapRef = useRef();
   const markerRef = useRef();
 
@@ -251,7 +232,6 @@ const Map = ({navigation}) => {
   const getLiveLocation = async () => {
     const locPermissionDenied = await locationPermission();
     if (locPermissionDenied) {
-      const {latitude, longitude, heading} = await getCurrentLocation();
       console.log('get live location after 4 second', heading);
       animate(latitude, longitude);
       updateState({
@@ -434,7 +414,10 @@ const Map = ({navigation}) => {
                 alignItems: 'center',
                 marginRight: w(4),
               }}>
-             <Image source={require("../../assets/images/userIcon.png")}  style={{width:w(14),height:w(14)}} />
+              <Image
+                source={require('../../assets/images/userIcon.png')}
+                style={{width: w(14), height: w(14)}}
+              />
               <View style={{marginLeft: w(2)}}>
                 <Text style={{fontSize: fs(17)}}>Vehicle number</Text>
                 <Text style={{fontSize: fs(20), color: 'black'}}>NH25663</Text>

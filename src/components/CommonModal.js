@@ -43,7 +43,7 @@ const CommonModal = props => {
                 backgroundColor: 'white',
                 padding: 12,
                 borderRadius: 44,
-                marginTop: Platform.OS == 'ios' ? h(7) : '',
+                marginTop: Platform.OS == 'ios' ? h(7) : 0,
               }}>
               <Entypo name="cross" size={26} color="grey" />
             </TouchableOpacity>
@@ -51,28 +51,28 @@ const CommonModal = props => {
           <View style={{flex: 1, justifyContent: 'space-around'}}>
             <TouchableOpacity
               style={{alignItems: 'center'}}
-              onPress={() => navigation.navigate('Orders')}>
+              onPress={() => {navigation.navigate('Orders'), closeModel()}}>
               <Ionicons name="car-outline" size={45} color="white" />
               <Text style={{color: 'white', fontWeight: 'bold'}}> Orders</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={{alignItems: 'center'}}
-              onPress={() => navigation.navigate('Wallet')}>
+              onPress={() => {navigation.navigate('Wallet'), closeModel()}}>
               <AntDesign name="wallet" size={45} color="white" />
               <Text style={{color: 'white', fontWeight: 'bold'}}> Wallet</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={{alignItems: 'center'}}
-              onPress={() => navigation.navigate('HelpCenter')}>
+              onPress={() => {navigation.navigate('HelpCenter'), closeModel()}}>
               <Entypo name="help-with-circle" size={45} color="white" />
               <Text style={{color: 'white', fontWeight: 'bold'}}> Help</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={{alignItems: 'center'}}
-              onPress={() => navigation.navigate('Settings')}>
+              onPress={() => {navigation.navigate('Settings'), closeModel()}}>
               <Entypo name="menu" size={45} color="white" />
               <Text style={{color: 'white', fontWeight: 'bold'}}>
                 {' '}

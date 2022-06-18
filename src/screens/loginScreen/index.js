@@ -32,7 +32,6 @@ const LoginScreen = ({ navigation }) => {
         },
       })
         .then(function (response) {
-          console.log('response--->>',response)
           if (response.status == 200) {
             const { data } = response;
             if (data.status == 'Success') {

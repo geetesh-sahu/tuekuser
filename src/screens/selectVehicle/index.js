@@ -43,7 +43,6 @@ const SelectVehicle = props => {
         },
       )
       .then(function (response) {
-        console.log('apporderApi+++++ ', response.data);
         if (response.status == 200) {
           if (response.data.status == 'Success') {
             dispatch(loader(false));
@@ -122,6 +121,7 @@ const SelectVehicle = props => {
               <TextInput
                 maxLength={15}
                 placeholder={`Reciever's Number`}
+                keyboardType="numeric"
                 placeholderTextColor="lightgrey"
                 style={{paddingLeft: 12}}
                 // orderData, setOrderData
@@ -143,6 +143,7 @@ const SelectVehicle = props => {
             <AntDesign name="user" size={25} />
             <TextInput
               maxLength={15}
+              
               placeholder="Name"
               placeholderTextColor={'lightgrey'}
               style={{paddingLeft: 12}}
@@ -219,6 +220,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginLeft: w(2),
     marginTop: h(3),
+   
   },
   horizontal: {
     flexDirection: 'row',
