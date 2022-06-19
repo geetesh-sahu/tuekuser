@@ -77,13 +77,14 @@ const Payment = ({navigation}) => {
         <Text style={styles.paymentText}>Online payment</Text>
         <View style={styles.horizontalLine} />
         <View style={styles.paystackBox}>
-          <TouchableOpacity
+          <View
             style={{flexDirection: 'row'}}
-            onPress={() => setA(true)}>
+            
+            >
             {/* onPress={() => navigation.navigate('PayStack')}> */}
             <Ionicons name="menu" size={28} color="blue" />
             <Text style={styles.paystackText}>paystack</Text>
-          </TouchableOpacity>
+          </View>
           {a && (
             <Paystack
               paystackKey="pk_test_a88482aae1d55ae1910928b8389fd9b9029d0a1d"
@@ -98,7 +99,7 @@ const Payment = ({navigation}) => {
               autoStart={true}
             />
           )}
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => setA(true)} >
             <Ionicons name="chevron-forward" size={26} color="grey" />
           </TouchableOpacity>
         </View>

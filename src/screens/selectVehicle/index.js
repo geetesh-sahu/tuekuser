@@ -7,6 +7,7 @@ import {
   Image,
   TextInput,
   ScrollView,
+  Linking,
 } from 'react-native';
 import React, {useContext, useState} from 'react';
 import CustomHeader from '../../components/CustomHeader';
@@ -22,6 +23,7 @@ import {loader} from '../../redux/actions/loader';
 import {useDispatch} from 'react-redux';
 
 const SelectVehicle = props => {
+  console.log('porps me kya ', props);
   const [orderData, setOrderData] = useContext(OrderContext);
   const [userData, setUserData] = useContext(UserContext);
   const dispatch = useDispatch();
@@ -60,6 +62,25 @@ const SelectVehicle = props => {
       });
   };
 
+  const callNumber = phone => {
+    console.log('callNumber ----> ', phone);
+    let phoneNumber = phone;
+    if (Platform.OS !== 'android') {
+      phoneNumber = `telprompt:${phone}`;
+    } else {
+      phoneNumber = `tel:${phone}`;
+    }
+    Linking.canOpenURL(phoneNumber)
+      .then(supported => {
+        if (!supported) {
+          Alert.alert('Phone number is not available');
+        } else {
+          return Linking.openURL(phoneNumber);
+        }
+      })
+      .catch(err => console.log(err));
+  };
+
   return (
     <View style={{flex: 1}}>
       <View>
@@ -86,17 +107,31 @@ const SelectVehicle = props => {
               <Image source={images.flag_image} style={{marginLeft: w(3)}} />
             </View>
             <View style={styles.locationArea}>
-              <TouchableOpacity style={styles.horizontal}>
+              <View style={styles.horizontal}>
                 <Text style={styles.placeName}>{orderData.pick_City}</Text>
-                <Ionicons name="chevron-forward" size={26} color="grey" />
-              </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() =>
+                    props.navigation.navigate('PickupLocation', {
+                      ulocation: 'Enter your pickup address',
+                    })
+                  }>
+                  <Ionicons name="chevron-forward" size={26} color="grey" />
+                </TouchableOpacity>
+              </View>
               <View style={[styles.horizontalLine, {marginVertical: h(1)}]} />
-              <TouchableOpacity style={styles.horizontal}>
+              <View style={styles.horizontal}>
                 <Text style={styles.placeName}>
                   {orderData.destination_Address}
                 </Text>
-                <Ionicons name="chevron-forward" size={26} color="grey" />
-              </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() =>
+                    props.navigation.navigate('PickupLocation', {
+                      ulocation: 'Enter your destination address',
+                    })
+                  }>
+                  <Ionicons name="chevron-forward" size={26} color="grey" />
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
           <View
@@ -109,7 +144,8 @@ const SelectVehicle = props => {
             <Text style={{marginLeft: w(4)}}>{userData.mobile_No}</Text>
             <View style={styles.textWithIcon}>
               <Text style={{fontSize: fs(10)}}>Select from contact</Text>
-              <TouchableOpacity>
+
+              <TouchableOpacity onPress={num => callNumber(num)}>
                 <Ionicons name="chevron-forward" size={30} color="grey" />
               </TouchableOpacity>
             </View>
@@ -133,7 +169,7 @@ const SelectVehicle = props => {
             </View>
             <View style={styles.textWithIcon}>
               <Text style={{fontSize: fs(10)}}>Select from contact</Text>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={callNumber}>
                 <Ionicons name="chevron-forward" size={30} color="grey" />
               </TouchableOpacity>
             </View>
@@ -143,7 +179,6 @@ const SelectVehicle = props => {
             <AntDesign name="user" size={25} />
             <TextInput
               maxLength={15}
-              
               placeholder="Name"
               placeholderTextColor={'lightgrey'}
               style={{paddingLeft: 12}}
@@ -220,7 +255,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginLeft: w(2),
     marginTop: h(3),
-   
   },
   horizontal: {
     flexDirection: 'row',

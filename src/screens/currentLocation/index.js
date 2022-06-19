@@ -33,7 +33,7 @@ const CurrentLocation = ({navigation}) => {
   const [currnetloc, setcurrnetloc] = useState('');
   const [show, setshow] = useState(true);
   const [confirm, setconfirm] = useState(false);
-  const [dateTime, setdateTime] = useState("date")
+  const [dateTime, setdateTime] = useState('date');
   const [date, setDate] = useState(new Date());
   const dispatch = useDispatch();
 
@@ -44,7 +44,12 @@ const CurrentLocation = ({navigation}) => {
   Geocoder.init('AIzaSyBzhsIqqHLkDrRiSqt94pxHJCdHHXgA464');
 
   const onChange = (event, selectedDate) => {
-    setdateTime('date')
+   
+    if (dateTime == 'time') {
+      setdateTime('date');
+    } else {
+      setdateTime('time');
+    }
     setCalenderShow(false);
     const date = moment(selectedDate).format();
     setDate(selectedDate);
@@ -140,25 +145,11 @@ const CurrentLocation = ({navigation}) => {
   };
 
   const validationForOnSubmitHandler = () => {
-    // if (orderData.pickup_Date == '') {
-    //   showMessage({
-    //     message: 'Please select date',
-    //     type: 'warning',
-    //   });
-    //   return false;
-    // }
-    // if (orderData.pickup_Time == '') {
-    //   showMessage({
-    //     message: 'Please select date',
-    //     type: 'warning',
-    //   });
-    //   return false;
-    // }
     if (
       orderData.Pick_Late == '' ||
       orderData.Pick_Long == '' ||
       orderData.pick_Location == '' ||
-      orderData.pick_Address == '' ||
+      orderData.pick_Addressss == '' ||
       orderData.pick_City == ''
     ) {
       showMessage({
@@ -190,66 +181,65 @@ const CurrentLocation = ({navigation}) => {
     return true;
   };
 
-
   const onSubmitHandler = () => {
-    if(orderData.pick_Address==orderData.destination_Address){
+    if (orderData.pick_Address == orderData.destination_Address) {
       showMessage({
-        message: "address should not be same",
-        type: "danger",
+        message: 'address should not be same',
+        type: 'danger',
       });
-    }else{
-   
-    dispatch(loader(true));
-    axios
-      .post(
-        'http://tuketuke.azurewebsites.net/api/OrderDetails/GetDistancebyAPI',
-        {
-          pick_Lat: orderData.Pick_Late,
-          pick_lng: orderData.Pick_Long,
-          destination_Lat: orderData.destination_Late,
-          destination_Lng: orderData.destination_Long,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
+    } else {
+      dispatch(loader(true));
+      axios
+        .post(
+          'http://tuketuke.azurewebsites.net/api/OrderDetails/GetDistancebyAPI',
+          {
+            pick_Lat: orderData.Pick_Late,
+            pick_lng: orderData.Pick_Long,
+            destination_Lat: orderData.destination_Late,
+            destination_Lng: orderData.destination_Long,
           },
-        },
-      )
-      .then(async function (response) {
-        if (response.status == 200) {
-          if (response.data.status == 'Success') {
-            await setOrderData({
-              ...orderData,
-              pickup_Date: moment(date).format(), pickup_Time: moment(date).format(),
-              estimated_Cost: response.data.data.amount,
-              distance: response.data.data.distance,
-            });
-            dispatch(loader(false));
-            navigation.navigate('SelectVehicle');
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          },
+        )
+        .then(async function (response) {
+          if (response.status == 200) {
+            if (response.data.status == 'Success') {
+              await setOrderData({
+                ...orderData,
+                pickup_Date: moment(date).format(),
+                pickup_Time: moment(date).format(),
+                estimated_Cost: response.data.data.amount,
+                distance: response.data.data.distance,
+              });
+              dispatch(loader(false));
+              navigation.navigate('SelectVehicle');
+            } else {
+              dispatch(loader(false));
+            }
           } else {
             dispatch(loader(false));
           }
-        } else {
+        })
+        .catch(function (error) {
+          showMessage({
+            message: error.toString(),
+            type: 'warning',
+          });
           dispatch(loader(false));
-        }
-      })
-      .catch(function (error) {
-        showMessage({
-          message: error.toString(),
-          type: 'warning',
         });
-        dispatch(loader(false));
-      });
     }
   };
 
   const exachangeAddressHandler = () => {
-    if(orderData.destination_Location == ''){
+    if (orderData.destination_Location == '') {
       showMessage({
-        message: "please enter destination address",
+        message: 'please enter destination address',
         type: 'warning',
       });
-    }else{
+    } else {
       setOrderData({
         ...orderData,
         Pick_Late: orderData.destination_Late,
@@ -262,9 +252,8 @@ const CurrentLocation = ({navigation}) => {
         destiNation_City: orderData.pick_City,
         destination_Address: orderData.pick_Address,
         destination_Location: orderData.pick_Location,
-      })
+      });
     }
-   
   };
 
   const showTime = () => {
@@ -411,25 +400,25 @@ const CurrentLocation = ({navigation}) => {
                   }}
                   onPress={() =>
                     navigation.navigate('PickupLocation', {
-                      ulocation: 'Pickup address',
+                      ulocation: 'Enter your pickup address',
                     })
                   }>
                   <Ionicons name="chevron-forward" size={26} color="grey" />
                 </TouchableOpacity>
               </View>
               <View style={styles.refreshView}>
-                <TouchableOpacity onPress={exachangeAddressHandler}  >
-                  <Image source={images.asyncIcon} />
+                <TouchableOpacity onPress={exachangeAddressHandler}>
+                  <Image source={images.asyncIcon} style={{height:w(7),width:w(7)}}  />
                 </TouchableOpacity>
               </View>
               {orderData.destination_Location == '' ? (
                 <CommonInputField
                   onFocus={() =>
                     navigation.navigate('PickupLocation', {
-                      ulocation: 'Destination address',
+                      ulocation: 'Enter your destination address',
                     })
                   }
-                  placeholder="Enter destination address"
+                  placeholder="Enter your destination address"
                   inputStyle={styles.inputView}
                 />
               ) : (
@@ -438,7 +427,6 @@ const CurrentLocation = ({navigation}) => {
                     <Text>Destination address</Text>
                     <View>
                       <Text style={styles.placeName}>
-                       
                         {orderData.destination_Location}
                       </Text>
                       <Text> {orderData.destination_Address}</Text>
@@ -448,7 +436,7 @@ const CurrentLocation = ({navigation}) => {
                     style={{justifyContent: 'center'}}
                     onPress={() =>
                       navigation.navigate('PickupLocation', {
-                        ulocation: 'Destination Address',
+                        ulocation: 'Enter your destination address',
                       })
                     }>
                     <Ionicons name="chevron-forward" size={26} color="grey" />
