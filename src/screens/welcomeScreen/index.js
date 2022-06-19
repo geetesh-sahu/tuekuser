@@ -237,13 +237,13 @@ const WelcomeScreen = ({ navigation }) => {
           <CommonBtn
             text="Agree"
             onPress={() =>
-              location
-                ? navigation.navigate('LoginWithNumber')
-                : showMessage({
-                  message: 'Location Permission Required',
-                  type: 'warning',
-                })
-              // navigation.navigate('LoginWithNumber')
+              // location
+              //   ? navigation.navigate('LoginWithNumber')
+              //   : showMessage({
+              //     message: 'Location Permission Required',
+              //     type: 'warning',
+              //   })
+               navigation.navigate('LoginWithNumber')
             }
             bgColor
           />
