@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import React, {useState, useRef,useEffect} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import {colors, images} from '../../constants';
 import CommonInputField from '../../components/CommonInputField';
 import {fs, h, regx, w} from '../../config';
@@ -39,9 +39,8 @@ const LoginScreen = ({navigation}) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    getCurrentLocation()
-  }, [])
-  
+    getCurrentLocation();
+  }, []);
 
   const getCurrentLocation = () => {
     Geolocation.getCurrentPosition(
@@ -53,7 +52,7 @@ const LoginScreen = ({navigation}) => {
         );
         Geocoder.from(position.coords.latitude, position.coords.longitude)
           .then(async json => {
-            console.log('json---->>>',json)
+            console.log('json---->>>', json);
             const addressComponent = json.results[0].address_components;
             const addresCurrent = addressComponent[1].long_name;
           })
