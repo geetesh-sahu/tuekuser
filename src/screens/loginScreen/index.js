@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef,useEffect} from 'react';
 import {colors, images} from '../../constants';
 import CommonInputField from '../../components/CommonInputField';
 import {fs, h, regx, w} from '../../config';
@@ -18,6 +18,10 @@ import {loader} from '../../redux/actions/loader';
 import {showMessage, hideMessage} from 'react-native-flash-message';
 import MaterialIcons from 'react-native-vector-icons/dist/MaterialIcons';
 import PhoneInput from 'react-native-phone-number-input';
+import Geolocation from 'react-native-geolocation-service';
+import Geocoder from 'react-native-geocoding';
+
+Geocoder.init('AIzaSyBzhsIqqHLkDrRiSqt94pxHJCdHHXgA464');
 
 const LoginScreen = ({navigation}) => {
   const [number, setnumber] = useState('9754944101');
@@ -33,6 +37,34 @@ const LoginScreen = ({navigation}) => {
   const containerStyle = {backgroundColor: 'white', padding: 20};
 
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    getCurrentLocation()
+  }, [])
+  
+
+  const getCurrentLocation = () => {
+    Geolocation.getCurrentPosition(
+      position => {
+        console.log(
+          'lat, lng',
+          position.coords.latitude,
+          position.coords.longitude,
+        );
+        Geocoder.from(position.coords.latitude, position.coords.longitude)
+          .then(async json => {
+            console.log('json---->>>',json)
+            const addressComponent = json.results[0].address_components;
+            const addresCurrent = addressComponent[1].long_name;
+          })
+          .catch(error => console.log('error===>>', error));
+      },
+      error => {
+        console.log('error', error.code, error.message);
+      },
+      {enableHighAccuracy: false, timeout: 5000, maximumAge: 10000},
+    );
+  };
 
   const onConfirmHandler = async () => {
     if (!number) {
@@ -77,9 +109,6 @@ const LoginScreen = ({navigation}) => {
     }
   };
 
-  console.log('countryCode--->>>', countryCode);
-  console.log('number--->>>', number);
-
   return (
     <View style={styles.container}>
       <CustomHeader onPress={() => navigation.goBack()} />
@@ -99,7 +128,6 @@ const LoginScreen = ({navigation}) => {
             setnumber(text);
           }}
           onChangeFormattedText={text => {
-            console.log('text---MMm', text);
             setFormattedValue(text);
             setCountryCode(phoneInput.current?.state.code || '');
           }}
@@ -117,7 +145,7 @@ const LoginScreen = ({navigation}) => {
           textInputStyle={{
             height: h(5),
             marginTop: h(1),
-            marginLeft:w(-3),
+            marginLeft: w(-3),
             fontSize: fs(16),
           }}
         />
