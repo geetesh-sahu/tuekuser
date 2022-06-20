@@ -1,5 +1,3 @@
-
-
 import {
   StyleSheet,
   Text,
@@ -7,7 +5,7 @@ import {
   TouchableOpacity,
   FlatList,
   Image,
-  ScrollView
+  ScrollView,
 } from 'react-native';
 import React, {useCallback, useRef, useMemo} from 'react';
 import {Card, Title, Paragraph} from 'react-native-paper';
@@ -15,16 +13,29 @@ import Ionicons from 'react-native-vector-icons/dist/Ionicons';
 import Entypo from 'react-native-vector-icons/dist/Entypo';
 import {fs, h, w} from '../config';
 import {colors, images} from '../constants';
+import {Modal, Portal, Button, Provider} from 'react-native-paper';
+import CommonBottomSheet from './CommonBottomSheet';
 
 
-const DATA = [{name: 'geetesh'}, {name: 'geetesh'}, {name: 'geetesh'}, {name: 'geetesh'}, {name: 'geetesh'}];
+const DATA = [
+  {name: 'geetesh'},
+  {name: 'geetesh'},
+  {name: 'geetesh'},
+  {name: 'geetesh'},
+  {name: 'geetesh'},
+];
 
-const ImageContainer = (props) => {
-      const {navigation} = props
+const ImageContainer = props => {
+  const [visible, setVisible] = React.useState(false);
+  const {navigation} = props;
 
   const getDriverDetail = () => {
     navigation.navigate('DriverDetials');
   };
+
+  const showModal = () => setVisible(true);
+  const hideModal = () => setVisible(false);
+  const containerStyle = {backgroundColor: 'white', padding: 20};
 
   return (
     <View style={styles.topImage}>
@@ -32,11 +43,10 @@ const ImageContainer = (props) => {
         data={DATA}
         renderItem={({item}) => {
           return (
-          
             <Card style={styles.cardContainer}>
               <TouchableOpacity
-              //  onPress={getDriverDetail}
-               >
+                //  onPress={getDriverDetail}
+                onPress={showModal}>
                 <Card.Content>
                   <View
                     style={{
@@ -91,6 +101,17 @@ const ImageContainer = (props) => {
           );
         }}
       />
+      <Provider>
+        <Portal>
+          <Modal
+            visible={visible}
+            onDismiss={hideModal}
+            contentContainerStyle={containerStyle}>
+            <CommonBottomSheet />
+          </Modal>
+        </Portal>
+        <Button style={{marginTop: 30}}>Show</Button>
+      </Provider>
     </View>
   );
 };
@@ -146,6 +167,5 @@ const styles = StyleSheet.create({
     right: 0,
     overflow: 'hidden',
     // height: 550,
-   
   },
 });
