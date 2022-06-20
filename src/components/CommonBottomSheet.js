@@ -1,4 +1,10 @@
-import {StyleSheet, Text, View, Pressable, TouchableOpacity} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Pressable,
+  TouchableOpacity,
+} from 'react-native';
 import React from 'react';
 import {Avatar} from 'react-native-paper';
 import {fs, h, w} from '../config';
@@ -179,7 +185,7 @@ const CommonBottomSheet = props => {
         </Text>
         <TouchableOpacity
           style={{flexDirection: 'row', alignItems: 'center'}}
-          onPress={()=>navigation.navigate('Invoice')}>
+          onPress={() => navigation.navigate('Invoice')}>
           <Text style={{color: colors.hex_414042, fontSize: fs(15)}}>
             Invoice
           </Text>

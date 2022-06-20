@@ -1,5 +1,12 @@
-import {StyleSheet, Text, View, Image, TouchableOpacity,ScrollView} from 'react-native';
-import React, {useState} from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+} from 'react-native';
+import React, {useState, useRef} from 'react';
 import {colors, images} from '../../constants';
 import CommonInputField from '../../components/CommonInputField';
 import {fs, h, regx, w} from '../../config';
@@ -10,14 +17,16 @@ import {useDispatch} from 'react-redux';
 import {loader} from '../../redux/actions/loader';
 import {showMessage, hideMessage} from 'react-native-flash-message';
 import MaterialIcons from 'react-native-vector-icons/dist/MaterialIcons';
-import { Modal, Portal, Button, Provider,  } from 'react-native-paper';
-
-
+import PhoneInput from 'react-native-phone-number-input';
 
 const LoginScreen = ({navigation}) => {
-  const [number, setnumber] = useState('+919754944101');
+  const [number, setnumber] = useState('9754944101');
   const [isError, setIsError] = useState(false);
   const [visible, setVisible] = React.useState(false);
+  const [value, setValue] = useState('');
+  const [formattedValue, setFormattedValue] = useState('');
+  const [countryCode, setCountryCode] = useState('');
+  const phoneInput = useRef(null);
 
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
@@ -32,7 +41,7 @@ const LoginScreen = ({navigation}) => {
       dispatch(loader(true));
       const string = encodeURIComponent('+');
       axios({
-        url: `http://tuketuke.azurewebsites.net/api/Login/SMSNotification?Mobile_No=${string}${number}`,
+        url: `http://tuketuke.azurewebsites.net/api/Login/SMSNotification?Mobile_No=${string}${countryCode}${number}`,
         method: 'post',
         headers: {
           // Accept: 'application/json',
@@ -68,6 +77,9 @@ const LoginScreen = ({navigation}) => {
     }
   };
 
+  console.log('countryCode--->>>', countryCode);
+  console.log('number--->>>', number);
+
   return (
     <View style={styles.container}>
       <CustomHeader onPress={() => navigation.goBack()} />
@@ -79,35 +91,36 @@ const LoginScreen = ({navigation}) => {
         <View style={styles.inputFieldContainer}>
           <Text style={styles.fieldName}>Enter your number</Text>
         </View>
-        <View style={{flexDirection: 'row'}}>
-          <TouchableOpacity
-            style={{
-              backgroundColor: 'white',
-              alignItems: 'center',
-              marginLeft: w(6),
-              width: w(10),
-              flexDirection: 'row',
-            }}
-            onPress={showModal}
-            >
-            <Text style={{marginLeft: w(1), color: 'black'}}>+91</Text>
-            <MaterialIcons name="arrow-drop-down" size={17} color="black" />
-          </TouchableOpacity>
-          <CommonInputField
-            
-            inputStyle={{width: w(75), backgroundColor: 'white'}}
-            value={number}
-            onChangeText={text => setnumber(text)}
-            maxLength={15}
-            keyboardType={'phone-pad'}
-            warningTitle={
-              !number
-                ? `Mobile Number is required`
-                : `Please enter your valid mobile number!`
-            }
-            warning={!number ? isError : false}
-          />
-        </View>
+        <PhoneInput
+          ref={phoneInput}
+          defaultValue={number}
+          layout="second"
+          onChangeText={text => {
+            setnumber(text);
+          }}
+          onChangeFormattedText={text => {
+            console.log('text---MMm', text);
+            setFormattedValue(text);
+            setCountryCode(phoneInput.current?.state.code || '');
+          }}
+          countryPickerProps={{withAlphaFilter: true}}
+          // disabled={disabled}
+
+          withDarkTheme
+          withShadow
+          autoFocus
+          containerStyle={{
+            height: h(7),
+            width: w(90),
+            alignSelf: 'center',
+          }}
+          textInputStyle={{
+            height: h(5),
+            marginTop: h(1),
+            marginLeft:w(-3),
+            fontSize: fs(16),
+          }}
+        />
       </View>
       <Text style={styles.otpSendText}>
         We will send you verification to this number
@@ -117,22 +130,6 @@ const LoginScreen = ({navigation}) => {
         onPress={onConfirmHandler}
         customBtnStyle={{padding: 12, width: 350}}
       />
-      <Provider>
-        <Portal>
-          <Modal
-            visible={visible}
-            onDismiss={hideModal}
-            contentContainerStyle={containerStyle}>
-              <ScrollView>
-            <View style={{height:h(100)}}>
-              <Text style={{fontSize:fs(18),color:'black',marginBottom:h(2)}}>Select you country</Text>
-              <CommonInputField placeholder = {"Search..."} />
-            </View>
-            </ScrollView>
-          </Modal>
-        </Portal>
-     
-      </Provider>
     </View>
   );
 };
