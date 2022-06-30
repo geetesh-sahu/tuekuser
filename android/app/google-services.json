@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "215111408715-tilsrnajmc2di795j06t7lao1vklb2mf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tukedrive",
+            "certificate_hash": "ba628292f9d38f3d17a2861b1c6046954991be50"
+          }
+        },
+        {
           "client_id": "215111408715-3g9eqvikmu8ndt6prmk669id8ljaah41.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -37,6 +45,13 @@
             {
               "client_id": "215111408715-3g9eqvikmu8ndt6prmk669id8ljaah41.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "215111408715-9k4k8v31257424hqgsqosjaadvi43opi.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "org.TukeTuke.User"
+              }
             }
           ]
         }
@@ -51,6 +66,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "215111408715-mnji9g32512fm6clhr9bos38etmi4du2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tuketuke",
+            "certificate_hash": "810bfd9d3972f0760f93e31d9b58691ec3484570"
+          }
+        },
+        {
+          "client_id": "215111408715-on28p4tfh9gt8fgqte09aemelhi9upkb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tuketuke",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
           "client_id": "215111408715-3g9eqvikmu8ndt6prmk669id8ljaah41.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -66,6 +97,13 @@
             {
               "client_id": "215111408715-3g9eqvikmu8ndt6prmk669id8ljaah41.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "215111408715-9k4k8v31257424hqgsqosjaadvi43opi.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "org.TukeTuke.User"
+              }
             }
           ]
         }

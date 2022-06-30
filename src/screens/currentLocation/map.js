@@ -1,156 +1,3 @@
-// import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-// import React, {useState, useRef, useEffect} from 'react';
-// import MapView, {Marker} from 'react-native-maps';
-// import {fs, h, height, w} from '../../config';
-// import CustomHeader from '../../components/CustomHeader';
-// import MapViewDirections from 'react-native-maps-directions';
-// import {colors} from '../../constants';
-// import {useDispatch, useSelector} from 'react-redux';
-// import axios from 'axios';
-// import { loader } from '../../redux/actions/loader';
-
-// const Map = ({navigation}) => {
-//   const [mapLocation, setmapLocation] = useState({
-//     pickupcords: {
-//       latitude: 12.97194,
-//       longitude: 77.532745,
-//       latitudeDelta: 0.015,
-//       longitudeDelta: 0.0121,
-//     },
-//     droplocationcords: {
-//       latitude: 22.7377,
-//       longitude: 75.8788,
-//       latitudeDelta: 0.015,
-//       longitudeDelta: 0.0121,
-//     },
-//   });
-
-//   const dispatch = useDispatch()
-
-//   useEffect(() => {
-//     // setmapLocation({
-//     //   pickupcords: {
-//     //     latitude : currentLocationLatitude,
-//     //     longitude : currentLocationLongitude,
-//     //     latitudeDelta: 0.015,
-//     //     longitudeDelta: 0.0121,
-//     //   },
-//     //   droplocationcords: {
-//     //     latitude: destinationLocationLatitue,
-//     //     longitude: destinationLocationLongitude,
-//     //     latitudeDelta: 0.015,
-//     //     longitudeDelta: 0.0121,
-//     //   },
-//     // })
-//     axios
-//         .get(
-//           `http://tuketuke.azurewebsites.net/api/OrderDetails/GetDriverTrackingInOrder?Order_No=10051 `,
-//           {
-//             headers: {
-//               'Content-Type': 'application/json',
-//             },
-//           },
-//         )
-//         .then(function (response) {
-//            console.log('response--->>',response)
-//           if (response.status == 200) {
-//             if (response.data.status == 'Success') {
-//               // signIn(response.data.data);
-//               dispatch(loader(false));
-//             }else{
-//               dispatch(loader(false));
-//             }
-//           } else {
-//             dispatch(loader(false));
-//           }
-//         })
-//         .catch(function (error) {
-//           console.log('error: ', error);
-//           dispatch(loader(false));
-//         });
-
-//   }, [])
-
-//   const currentLocationLatitude = useSelector(
-//     state => state.locationReducer.data.latitude,
-//   );
-//   const currentLocationLongitude = useSelector(
-//     state => state.locationReducer.data.longitude,
-//   );
-
-//   const destinationLocationLatitue = useSelector(
-//     state => state.destinationLocationReducer.data.latitude,
-//   );
-//   const destinationLocationLongitude = useSelector(
-//     state => state.destinationLocationReducer.data.longitude,
-//   );
-
-//   const mapRef = useRef();
-//   const {pickupcords, droplocationcords} = mapLocation;
-//   return (
-//     <View style={{flex: 1}}>
-//       <CustomHeader onPress={() => navigation.goBack()} text="Confirmation" />
-//       <View style={{height: h(70)}}>
-//         <MapView
-//           // provider='AIzaSyBzhsIqqHLkDrRiSqt94pxHJCdHHXgA464' // remove if not using Google Maps
-//           ref={mapRef}
-//           style={StyleSheet.absoluteFill}
-//           region={pickupcords}>
-//           <Marker coordinate={pickupcords} />
-//           <Marker coordinate={droplocationcords}   />
-//           <MapViewDirections
-//             origin={pickupcords}
-//             destination={droplocationcords}
-//             apikey={'AIzaSyBzhsIqqHLkDrRiSqt94pxHJCdHHXgA464'}
-//             strokeWidth={7}
-//             strokeColor={'blue'}
-//             optimizeWaypoints={true}
-//             onReady={result => {
-//               mapRef.current.fitToCoordinates(result.coordinate, {
-//                 edgePadding: {
-//                   right: 530,
-//                   bottom: 300,
-//                   left: 530,
-//                   top: 500,
-//                 },
-//               });
-//             }}
-//           />
-//         </MapView>
-//       </View>
-//       <View
-//         style={{
-//           justifyContent: 'space-between',
-//           flex: 1,
-//           marginVertical: w(8),
-//           alignItems: 'center',
-//         }}>
-//         <Text style={{fontSize: fs(16)}}>Location a suitable vehicle ...</Text>
-//         <TouchableOpacity onPress={() => navigation.goBack()}>
-//           <Text style={{color: 'black', fontSize: fs(17), fontWeight: '600'}}>
-//             Cancel
-//           </Text>
-//         </TouchableOpacity>
-//       </View>
-//     </View>
-//   );
-// };
-
-// export default Map;
-
-// const styles = StyleSheet.create({
-//   map: {
-//     width: '100%',
-//     height: '95%',
-//     marginTop: h(2),
-//   },
-//   header: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     justifyContent: 'space-between',
-//   },
-// });
-
 import React, {useState, useRef, useEffect} from 'react';
 import {
   View,
@@ -168,10 +15,12 @@ import Geolocation from 'react-native-geolocation-service';
 import {locationPermission} from '../../utils/helperFunctions/locationPermission';
 import {loader} from '../../redux/actions/loader';
 import {useContext} from 'react';
-import {OrderContext} from '../../utils/context';
+import {OrderContext, UserContext} from '../../utils/context';
 import {fs, h, w} from '../../config';
 import FontAwesome5 from 'react-native-vector-icons/dist/FontAwesome5';
 import LottieView from 'lottie-react-native';
+import axios from 'axios';
+import {useDispatch} from 'react-redux';
 
 const screen = Dimensions.get('window');
 const ASPECT_RATIO = screen.width / screen.height;
@@ -179,8 +28,66 @@ const LATITUDE_DELTA = 0.04;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
 const Map = ({navigation}) => {
+  const mapRef = useRef();
+  const markerRef = useRef();
+  const dispatch = useDispatch();
   const [orderData, setOrderData] = useContext(OrderContext);
-  const [searching, setsearching] = useState(true);
+  const [searching, setsearching] = useState(false);
+  const [userData, setUserData] = useContext(UserContext);
+
+  console.log('userData===>>', userData);
+
+  const getCurrentLocation = () =>
+    new Promise((resolve, reject) => {
+      Geolocation.getCurrentPosition(
+        position => {
+          const cords = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            heading: position?.coords?.heading,
+          };
+          console;
+          resolve(cords);
+        },
+        error => {
+          reject(error.message);
+        },
+        {enableHighAccuracy: true, timeout: 15000},
+      );
+    });
+
+  // useEffect(() => {
+  //   axios
+  //     .get(
+  //       `http://tuketuke.azurewebsites.net/api/OrderDetails/GetDriverTrackingInOrder?Order_No=${10051} `,
+  //       {
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //         },
+  //       },
+  //     )
+  //     .then(function (response) {
+  //       console.log('driver data>', response.data.data.driverLat);
+  //       setdriverCoordinage({
+  //         driverLattitue: response.data.data.driverLat,
+  //         driverLongitue: response.data.data.driverLng,
+  //       });
+  //       if (response.status == 200) {
+  //         if (response.data.status == 'Success') {
+  //           // signIn(response.data.data);
+  //           dispatch(loader(false));
+  //         } else {
+  //           dispatch(loader(false));
+  //         };
+  //       } else {
+  //         dispatch(loader(false));
+  //       };
+  //     })
+  //     .catch(function (error) {
+  //       console.log('error: ', error);
+  //       dispatch(loader(false));
+  //     });
+  // }, []);
 
   useEffect(() => {
     setTimeout(() => {
@@ -188,24 +95,23 @@ const Map = ({navigation}) => {
     }, 5000);
   }, []);
 
-  const mapRef = useRef();
-  const markerRef = useRef();
-
   const [state, setState] = useState({
     curLoc: {
-      latitude: orderData.Pick_Late,
-      longitude: orderData.Pick_Long,
+      latitude: 75.1263,
+      longitude: 77.8852,
+      latitudeDelta: LATITUDE_DELTA,
+      longitudeDelta: LONGITUDE_DELTA,
     },
     destinationCords: {
-      latitude: orderData.destination_Late,
-      longitude: orderData.destination_Long,
+      latitude: orderData.pick_Late,
+      longitude: orderData.pick_Long,
       latitudeDelta: LATITUDE_DELTA,
       longitudeDelta: LONGITUDE_DELTA,
     },
     isLoading: false,
     coordinate: new AnimatedRegion({
-      latitude: orderData.Pick_Late,
-      longitude: orderData.Pick_Long,
+      latitude: 75.1263,
+      longitude: 77.8852,
       latitudeDelta: LATITUDE_DELTA,
       longitudeDelta: LONGITUDE_DELTA,
     }),
@@ -223,41 +129,92 @@ const Map = ({navigation}) => {
     coordinate,
     heading,
   } = state;
+
   const updateState = data => setState(state => ({...state, ...data}));
 
   useEffect(() => {
-    getLiveLocation();
+    // getDriverLocation();
   }, []);
 
-  const getLiveLocation = async () => {
-    const locPermissionDenied = await locationPermission();
-    if (locPermissionDenied) {
-      console.log('get live location after 4 second', heading);
-      animate(latitude, longitude);
-      updateState({
-        heading: heading,
-        curLoc: {latitude: orderData.Pick_Late, longitude: orderData.Pick_Long},
-        coordinate: new AnimatedRegion({
-          latitude: latitude,
-          longitude: longitude,
-          latitudeDelta: LATITUDE_DELTA,
-          longitudeDelta: LONGITUDE_DELTA,
-        }),
+  const getDriverLocation = async () => {
+    axios
+      .get(
+        `http://tuketuke.azurewebsites.net/api/OrderDetails/GetDriverTrackingInOrder?Order_No=${10051} `,
+        {headers: {'Content-Type': 'application/json'}},
+      )
+      .then(async function (response) {
+        if (response.status == 200) {
+          if (response.data.status == 'Success') {
+            const latitude = await response.data.data.driverLat;
+            const longitude = await response.data.data.driverLng;
+            animate(latitude, longitude);
+            updateState({
+              heading: heading,
+              curLoc: {latitude, longitude},
+              coordinate: new AnimatedRegion({
+                latitude: latitude,
+                longitude: longitude,
+                latitudeDelta: LATITUDE_DELTA,
+                longitudeDelta: LONGITUDE_DELTA,
+              }),
+            });
+            dispatch(loader(false));
+          } else {
+            dispatch(loader(false));
+          }
+        } else {
+          dispatch(loader(false));
+        }
+      })
+      .catch(function (error) {
+        console.log('error: ', error);
+        dispatch(loader(false));
       });
-    }
+
+    // const latitude = orderData.pick_Late;
+    // const longitude = orderData.pick_Long;
+    // animate(latitude, longitude);
+    // updateState({
+    //   heading: heading,
+    //   curLoc: {latitude, longitude},
+    //   coordinate: new AnimatedRegion({
+    //     latitude: latitude,
+    //     longitude: longitude,
+    //     latitudeDelta: LATITUDE_DELTA,
+    //     longitudeDelta: LONGITUDE_DELTA,
+    //   }),
+    // });
+
+    // const locPermissionDenied = await locationPermission();
+    // if (locPermissionDenied) {
+    //   console.log('get live location after 4 second', heading);
+    //   const latitude = orderData.pick_Late;
+    //   const longitude = orderData.pick_Long;
+    //   animate(latitude, longitude);
+    //   updateState({
+    //     heading: heading,
+    //     curLoc: {latitude, longitude},
+    //     coordinate: new AnimatedRegion({
+    //       latitude: latitude,
+    //       longitude: longitude,
+    //       latitudeDelta: LATITUDE_DELTA,
+    //       longitudeDelta: LONGITUDE_DELTA,
+    //     }),
+    //   });
+    // }
   };
 
   useEffect(() => {
     const interval = setInterval(() => {
-      getLiveLocation();
+      getDriverLocation();
     }, 6000);
     return () => clearInterval(interval);
   }, []);
 
   const animate = (latitude, longitude) => {
     const newCoordinate = {
-      latitude: orderData.Pick_Late,
-      longitude: orderData.Pick_Long,
+      latitude: latitude,
+      longitude: longitude,
     };
     if (Platform.OS == 'android') {
       if (markerRef.current) {
@@ -284,14 +241,43 @@ const Map = ({navigation}) => {
     });
   };
 
+  const onCancleOrder = (num, status) => {
+    axios
+      .post(
+        'http://tuketuke.azurewebsites.net/api/OrderDetails/UpdateOrderStatus',
+        {
+          order_No: orderData.order_No,
+          order_StatuId: num,
+          order_Status: status,
+          driver_MobileNo: userData.mobile_No,
+        },
+      )
+      .then(function ({data}) {
+        console.log(data.data.order_Status);
+        if (data) {
+          if (data.data.order_Status == 'Order Canceled') {
+            navigation.navigate('CurrentLocation');
+          } else {
+            // setOrderData('');
+            // setIsOrderExist(false);
+          }
+        }
+      })
+      .catch(function (err) {
+        // showMessage({
+        //   message: `${err.response.status} ${err.response.statusText}`,
+        //   type: 'warning',
+        // });
+      });
+  };
+
   return (
     <View style={styles.container}>
-      {distance !== 0 && time !== 0 && (
-        <View style={{alignItems: 'center', marginVertical: 16}}>
-          <Text>Time left: {time.toFixed(0)} </Text>
-          <Text>Distance left: {distance.toFixed(0)}</Text>
-        </View>
-      )}
+      <TouchableOpacity
+        onPress={() => onCancleOrder(7, 'Order Canceled')}
+        style={{alignItems: 'flex-end', padding: w(8)}}>
+        <Text>Cancel order</Text>
+      </TouchableOpacity>
       <View style={{flex: 1}}>
         <MapView
           ref={mapRef}
@@ -303,25 +289,24 @@ const Map = ({navigation}) => {
           }}>
           <Marker.Animated ref={markerRef} coordinate={coordinate}>
             <Image
-              source={require('../../assets/images/bike.png')}
+              source={require('../../assets/images/bike.jpg')}
               style={{
                 width: 40,
                 height: 40,
                 transform: [{rotate: `${heading}deg`}],
-                alignSelf: 'center',
-                justifyContent: 'center',
-                alignItems: 'center',
+                // alignSelf: 'center',
+                // justifyContent: 'center',
+                // alignItems: 'center',
               }}
               resizeMode="contain"
             />
           </Marker.Animated>
 
-          {Object.keys(destinationCords).length > 0 && (
-            <Marker
-              coordinate={destinationCords}
-              source={require('../../assets/images/greenMarker.png')}
-            />
-          )}
+          {/* {Object.keys(destinationCords).length > 0 && ( */}
+          <Marker coordinate={destinationCords}>
+            <Image source={require('../../assets/images/greenMarker.png')} />
+          </Marker>
+          {/* )} */}
 
           {/* {Object.keys(destinationCords).length > 0 && ( */}
           <MapViewDirections

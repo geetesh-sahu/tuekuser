@@ -2,14 +2,13 @@ import {
   StyleSheet,
   Text,
   View,
-  SafeAreaView,
   TouchableOpacity,
   Image,
   TextInput,
   ScrollView,
   Linking,
 } from 'react-native';
-import React, {useContext, useState} from 'react';
+import React, {useContext} from 'react';
 import CustomHeader from '../../components/CustomHeader';
 import {fs, h, w} from '../../config';
 import VehicleSelection from '../../components/VehicleSelection';
@@ -21,19 +20,21 @@ import {OrderContext, UserContext} from '../../utils/context';
 import axios from 'axios';
 import {loader} from '../../redux/actions/loader';
 import {useDispatch} from 'react-redux';
+import moment from 'moment';
+
 
 const SelectVehicle = props => {
-  console.log('porps me kya ', props);
   const [orderData, setOrderData] = useContext(OrderContext);
   const [userData, setUserData] = useContext(UserContext);
+  console.log('userData in selectvehicle--->>',userData)
   const dispatch = useDispatch();
 
   const onSubmitHandler = () => {
     dispatch(loader(true));
     const params = orderData;
-    params.user_MobileNo = userData.user_MobileNo;
-
+    params.user_MobileNo = userData.mobile_No;
     params.estimated_Cost = orderData.estimated_Cost.toString();
+    console.log('params: ', params);
     axios
       .post(
         'http://tuketuke.azurewebsites.net/api/OrderDetails/AddOrder',
@@ -45,6 +46,7 @@ const SelectVehicle = props => {
         },
       )
       .then(function (response) {
+        console.log('response of AddOrderApi --->>>>', response.data);
         if (response.status == 200) {
           if (response.data.status == 'Success') {
             dispatch(loader(false));
@@ -108,7 +110,7 @@ const SelectVehicle = props => {
             </View>
             <View style={styles.locationArea}>
               <View style={styles.horizontal}>
-                <Text style={styles.placeName}>{orderData.pick_City}</Text>
+                <Text style={styles.placeName}>{`${orderData.pick_Address}`}</Text>
                 <TouchableOpacity
                   onPress={() =>
                     props.navigation.navigate('PickupLocation', {
@@ -192,7 +194,9 @@ const SelectVehicle = props => {
           <View style={styles.horizontalBox}>
             <Text style={{marginLeft: w(4)}}>Pick up time</Text>
             <View style={styles.textWithIcon}>
-              <Text style={styles.footerText}>Now</Text>
+            
+              <Text style={styles.footerText}>{moment(orderData.pickup_Date).format(' h:mm a')}</Text>
+          
               <TouchableOpacity>
                 <Ionicons name="chevron-forward" size={26} color="grey" />
               </TouchableOpacity>

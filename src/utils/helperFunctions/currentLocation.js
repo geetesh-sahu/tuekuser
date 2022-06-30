@@ -67,8 +67,8 @@ export const getCurrentLocation = () => {
           setOrderData({
             ...orderData,
             pick_City: address.city,
-            Pick_Late: position.coords.latitude,
-            Pick_Long: position.coords.longitude,
+            pick_Late: position.coords.latitude,
+            pick_Long: position.coords.longitude,
             pick_Location: address.street ? address.street : address.city,
             pick_Address: addresCurrent ? addresCurrent : address.city,
           });

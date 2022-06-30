@@ -5,10 +5,18 @@ export const AuthContext = createContext();
 export const OrderContext = React.createContext();
 export const OrderContextProvider = props => {
   const [orderData, setOrderData] = useState({
+    // "pickup_Date": "2022-06-29T10:45:48.237Z",
+    // "pickup_Time": "string",
+    // "pick_Location": "string",
+    // "pick_Address": "string",
+    // "pick_Late": 0,
+    // "pick_Long": 0,
+    // "pick_City": "string",
+
     pickup_Date: '',
     pickup_Time: '',
-    Pick_Late: '',
-    Pick_Long: '',
+    pick_Late: '',
+    pick_Long: '',
     pick_Location: '',
     pick_Address: '',
     pick_City: '',

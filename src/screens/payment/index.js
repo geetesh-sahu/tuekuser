@@ -45,6 +45,7 @@ const Payment = ({navigation}) => {
         },
       )
       .then(function (response) {
+        console.log('payment response--->>>',response.data.data)
         if (response.status == 200) {
           if (response.data.status == 'Success') {
             dispatch(loader(false));

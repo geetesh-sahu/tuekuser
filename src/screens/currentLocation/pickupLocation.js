@@ -87,8 +87,8 @@
 //     if (ulocation == 'Pickup address') {
 //       setOrderData({
 //         ...orderData,
-//         Pick_Late: lat,
-//         Pick_Long: lng,
+//         pick_Late: lat,
+//         pick_Long: lng,
 //         pick_City: address.city,
 //         pick_Address: address.street ? address.street : formatAddress,
 //         pick_Location: formatAddress ? formatAddress : address.street,
@@ -279,7 +279,6 @@ const PickupLocation = ({navigation, route}) => {
   }
 
   const locationHandler = async (data, details) => {
-    console.log('details---->>>', details.formatted_address);
     const lat = details.geometry.location.lat;
     const lng = details.geometry.location.lng;
     const formatAddress = details.formatted_address;
@@ -293,8 +292,8 @@ const PickupLocation = ({navigation, route}) => {
     if (ulocation == 'Enter your pickup address') {
       setOrderData({
         ...orderData,
-        Pick_Late: lat,
-        Pick_Long: lng,
+        pick_Late: lat,
+        pick_Long: lng,
         pick_City: address.city,
         pick_Address: address.street ? address.street : formatAddress,
         pick_Location: formatAddress ? formatAddress : address.street,

@@ -5,30 +5,27 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
-  Platform,
-  Button
 } from 'react-native';
-import React, { useState, useEffect, useContext } from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import Ionicons from 'react-native-vector-icons/dist/Ionicons';
 import AntDesign from 'react-native-vector-icons/dist/AntDesign';
-import { images } from '../../constants';
-import { fs, h, w } from '../../config';
+import {images} from '../../constants';
+import {fs, h, w} from '../../config';
 import CommonInputField from '../../components/CommonInputField';
 import CommonBtn from '../../components/CommonBtn';
 import CommonModal from '../../components/CommonModal';
 import VehicleSelection from '../../components/VehicleSelection';
-import { useDispatch } from 'react-redux';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { OrderContext } from '../../utils/context';
+import {useDispatch} from 'react-redux';
+import {OrderContext, UserContext} from '../../utils/context';
 import moment from 'moment';
 import axios from 'axios';
-import { loader } from '../../redux/actions/loader';
-import { showMessage } from 'react-native-flash-message';
+import {loader} from '../../redux/actions/loader';
+import {showMessage} from 'react-native-flash-message';
 import Geolocation from 'react-native-geolocation-service';
 import Geocoder from 'react-native-geocoding';
-import { Modal, Portal, Provider } from 'react-native-paper';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
-const CurrentLocation = ({ navigation }) => {
+const CurrentLocation = ({navigation}) => {
   const [isModal, setIsModal] = useState(false);
   const [calenderShow, setCalenderShow] = useState(false);
   const [orderData, setOrderData] = useContext(OrderContext);
@@ -37,22 +34,47 @@ const CurrentLocation = ({ navigation }) => {
   const [show, setshow] = useState(true);
   const [confirm, setconfirm] = useState(false);
   const [dateTime, setdateTime] = useState('date');
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState('');
   const [visible, setVisible] = React.useState(false);
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [next, setnext] = useState(true);
+  const [userData, setUserData] = useContext(UserContext);
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    getCurrentLocation();
-  }, []);
+  // useEffect(() => {
+  //   if (orderData && orderData.order_No) {
+  //     navigation.navigate('Map');
+  //   } else {
+  //     getCurrentLocation();
+  //   }
+  // }, []);
+
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+
+  const handleConfirm = date => {
+    const dates = moment(date).format();
+    const currentDate = moment(new Date()).format();
+    setDate(date);
+    setOrderData({
+      ...orderData,
+      pickup_Date: date ? dates : currentDate,
+      pickup_Time: date ? dates : currentDate,
+    });
+    hideDatePicker();
+  };
 
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
 
-
   Geocoder.init('AIzaSyBzhsIqqHLkDrRiSqt94pxHJCdHHXgA464');
 
   const onChange = (event, selectedDate) => {
-
     if (dateTime == 'time') {
       setdateTime('date');
     } else {
@@ -61,7 +83,7 @@ const CurrentLocation = ({ navigation }) => {
     setCalenderShow(false);
     const date = moment(selectedDate).format();
     setDate(selectedDate);
-    setOrderData({ ...orderData, pickup_Date: date, pickup_Time: date });
+    setOrderData({...orderData, pickup_Date: date, pickup_Time: date});
   };
 
   const modalHandler = () => {
@@ -133,12 +155,13 @@ const CurrentLocation = ({ navigation }) => {
               addresCurrent,
               addressComponent,
             );
+
             setcurrnetloc(address);
             setOrderData({
               ...orderData,
               pick_City: address.city,
-              Pick_Late: position.coords.latitude,
-              Pick_Long: position.coords.longitude,
+              pick_Late: position.coords.latitude,
+              pick_Long: position.coords.longitude,
               pick_Location: address.street ? address.street : address.city,
               pick_Address: addresCurrent ? addresCurrent : address.city,
             });
@@ -148,14 +171,14 @@ const CurrentLocation = ({ navigation }) => {
       error => {
         console.log('error', error.code, error.message);
       },
-      { enableHighAccuracy: false, timeout: 5000, maximumAge: 10000 },
+      {enableHighAccuracy: true, timeout: 15000},
     );
   };
 
   const validationForOnSubmitHandler = () => {
     if (
-      orderData.Pick_Late == '' ||
-      orderData.Pick_Long == '' ||
+      orderData.pick_Late == '' ||
+      orderData.pick_Long == '' ||
       orderData.pick_Location == '' ||
       orderData.pick_Addressss == '' ||
       orderData.pick_City == ''
@@ -190,19 +213,21 @@ const CurrentLocation = ({ navigation }) => {
   };
 
   const onSubmitHandler = () => {
+    const valid = validationForOnSubmitHandler();
+
     if (orderData.pick_Address == orderData.destination_Address) {
       showMessage({
         message: 'address should not be same',
         type: 'danger',
       });
-    } else {
+    } else if (valid) {
       dispatch(loader(true));
       axios
         .post(
           'http://tuketuke.azurewebsites.net/api/OrderDetails/GetDistancebyAPI',
           {
-            pick_Lat: orderData.Pick_Late,
-            pick_lng: orderData.Pick_Long,
+            pick_Lat: orderData.pick_Late,
+            pick_lng: orderData.pick_Long,
             destination_Lat: orderData.destination_Late,
             destination_Lng: orderData.destination_Long,
           },
@@ -213,6 +238,7 @@ const CurrentLocation = ({ navigation }) => {
           },
         )
         .then(async function (response) {
+          console.log('response--->>>', response.data.message);
           if (response.status == 200) {
             if (response.data.status == 'Success') {
               await setOrderData({
@@ -223,7 +249,7 @@ const CurrentLocation = ({ navigation }) => {
                 distance: response.data.data.distance,
               });
               dispatch(loader(false));
-              navigation.navigate('SelectVehicle');
+              setnext(false);
             } else {
               dispatch(loader(false));
             }
@@ -250,13 +276,13 @@ const CurrentLocation = ({ navigation }) => {
     } else {
       setOrderData({
         ...orderData,
-        Pick_Late: orderData.destination_Late,
-        Pick_Long: orderData.destination_Long,
+        pick_Late: orderData.destination_Late,
+        pick_Long: orderData.destination_Long,
         pick_Location: orderData.destination_Location,
         pick_Address: orderData.destination_Address,
         pick_City: orderData.destiNation_City,
-        destination_Late: orderData.Pick_Late,
-        destination_Long: orderData.Pick_Long,
+        destination_Late: orderData.pick_Late,
+        destination_Long: orderData.pick_Long,
         destiNation_City: orderData.pick_City,
         destination_Address: orderData.pick_Address,
         destination_Location: orderData.pick_Location,
@@ -270,46 +296,42 @@ const CurrentLocation = ({ navigation }) => {
   };
 
   const onConfirmHandler = () => {
-    const valid = validationForOnSubmitHandler();
-    if (valid) {
-      setconfirm(true);
-    }
+    navigation.navigate('SelectVehicle');
   };
 
   return (
-    <View style={{ flex: 1 }}>
-      <View style={{ flex: 1 }}>
-        {orderData.destination_Location == '' ? (
+    <View style={{flex: 1}}>
+      <View style={{flex: 1}}>
+        {next ? (
           <View style={styles.container1}>
             <View style={styles.cityName}>
               <Ionicons name="location-sharp" size={22} color="grey" />
               <Text>{orderData.pick_City}</Text>
             </View>
-
-            <TouchableOpacity style={styles.menuIconView}>
-              <View style={styles.square} />
-              <View style={[styles.square, { marginHorizontal: h(0.7) }]} />
-              <View style={styles.square} />
-            </TouchableOpacity>
+            {showIcon ? (
+              <TouchableOpacity
+                style={styles.menuIconView}
+                onPress={() => modalHandler()}>
+                <View style={styles.square} />
+                <View style={[styles.square, {marginHorizontal: h(0.7)}]} />
+                <View style={styles.square} />
+              </TouchableOpacity>
+            ) : null}
           </View>
         ) : (
           <>
-            {showIcon ? (
-              <TouchableOpacity
-                style={{ backgroundColor: 'white', flex: 1 }}
-                onPress={() => modalHandler()}>
-                <AntDesign
-                  name="pluscircle"
-                  size={32}
-                  color="grey"
-                  style={{
-                    marginTop: h(3),
-                    alignSelf: 'flex-end',
-                    marginRight: w(6),
-                  }}
-                />
-              </TouchableOpacity>
-            ) : null}
+            <TouchableOpacity style={{backgroundColor: 'white', flex: 1}}>
+              <AntDesign
+                name="pluscircle"
+                size={32}
+                color="grey"
+                style={{
+                  marginTop: h(3),
+                  alignSelf: 'flex-end',
+                  marginRight: w(6),
+                }}
+              />
+            </TouchableOpacity>
           </>
         )}
       </View>
@@ -321,21 +343,19 @@ const CurrentLocation = ({ navigation }) => {
         <ScrollView>
           <TouchableOpacity
             style={styles.locatinDetail}
-
-            onPress={showTime}
-          >
+            onPress={showDatePicker}>
             <Text>Pick up time </Text>
             <View style={styles.horizontalView}>
-              {show ? (
-                <Text style={styles.nowText}>Now</Text>
-              ) : (
-                <Text style={styles.nowText}>
-                  {orderData.pickup_Date &&
-                    moment(orderData.pickup_Date).format(
-                      'MMMM Do YYYY, h:mm a',
-                    )}
-                </Text>
-              )}
+              <Text style={styles.nowText}>
+                {date
+                  ? moment(orderData.pickup_Date).format('MMMM Do YYYY, h:mm a')
+                  : `Now`}
+              </Text>
+
+              {/* <Text style={styles.nowText}>
+                {orderData.pickup_Date &&
+                  moment(orderData.pickup_Date).format('MMMM Do YYYY, h:mm a')}
+              </Text> */}
 
               <View>
                 <Ionicons name="chevron-forward" size={26} color="grey" />
@@ -349,7 +369,7 @@ const CurrentLocation = ({ navigation }) => {
             }}
           />
 
-          <View style={{ flexDirection: 'row', marginTop: h(2) }}>
+          <View style={{flexDirection: 'row', marginTop: h(2)}}>
             <View
               style={{
                 marginLeft: w(4),
@@ -360,9 +380,9 @@ const CurrentLocation = ({ navigation }) => {
               <Ionicons name="ios-location-outline" size={22} color="grey" />
 
               {orderData.destination_Location == '' ? null : (
-                <View style={{ alignItems: 'center' }}>
+                <View style={{alignItems: 'center'}}>
                   <View
-                    style={{ height: h(1), width: 1, backgroundColor: 'black' }}
+                    style={{height: h(1), width: 1, backgroundColor: 'black'}}
                   />
                   <View
                     style={{
@@ -373,7 +393,7 @@ const CurrentLocation = ({ navigation }) => {
                     }}
                   />
                   <View
-                    style={{ height: h(15), width: 1, backgroundColor: 'black' }}
+                    style={{height: h(15), width: 1, backgroundColor: 'black'}}
                   />
                   <View
                     style={{
@@ -384,24 +404,24 @@ const CurrentLocation = ({ navigation }) => {
                     }}
                   />
                   <View
-                    style={{ height: '6%', width: 1, backgroundColor: 'black' }}
+                    style={{height: '6%', width: 1, backgroundColor: 'black'}}
                   />
                   <Image source={images.flag_image} style={{}} />
                 </View>
               )}
             </View>
 
-            <View style={{ width: '100%', marginLeft: w(3) }}>
+            <View style={{width: '100%', marginLeft: w(3)}}>
               <View style={styles.destinationStyle}>
                 <View style={styles.dAddress}>
                   <View>
                     <Text>Current pick up location</Text>
-                    {orderData.Pick_Late !== '' && (
+                    {orderData.pick_Late !== '' && (
                       <View>
                         <Text style={styles.placeName}>
-                          {orderData.pick_City}
+                          {`${orderData.pick_Address}`}
                         </Text>
-                        <Text>{`${orderData.pick_Address}`}</Text>
+                        <Text> {orderData.pick_City}</Text>
                       </View>
                     )}
                   </View>
@@ -420,7 +440,10 @@ const CurrentLocation = ({ navigation }) => {
               </View>
               <View style={styles.refreshView}>
                 <TouchableOpacity onPress={exachangeAddressHandler}>
-                  <Image source={images.asyncIcon} style={{ height: w(7), width: w(7) }} />
+                  <Image
+                    source={images.asyncIcon}
+                    style={{height: w(7), width: w(7)}}
+                  />
                 </TouchableOpacity>
               </View>
               {orderData.destination_Location == '' ? (
@@ -445,7 +468,7 @@ const CurrentLocation = ({ navigation }) => {
                     </View>
                   </View>
                   <TouchableOpacity
-                    style={{ justifyContent: 'center' }}
+                    style={{justifyContent: 'center'}}
                     onPress={() =>
                       navigation.navigate('PickupLocation', {
                         ulocation: 'Enter your destination address',
@@ -467,10 +490,10 @@ const CurrentLocation = ({ navigation }) => {
             />
           )}
 
-          <View style={{ flex: 1 }}>
+          <View style={{flex: 1}}>
             <VehicleSelection
               onScreenChange={(item, index) => {
-                setOrderData({ ...orderData, vehicle_ID: item.id });
+                setOrderData({...orderData, vehicle_ID: item.id});
               }}
             />
           </View>
@@ -483,46 +506,27 @@ const CurrentLocation = ({ navigation }) => {
           )}
         </ScrollView>
       </View>
-      <View style={{ flex: 0.91 }}>
-        {orderData.destination_Location == '' ? (
+      <View style={{flex: 0.87}}>
+        {next ? (
           <CommonBtn
             text="Confirm"
             customBtnStyle={styles.confirmBtn}
-            onPress={onConfirmHandler}
+            onPress={onSubmitHandler}
           />
         ) : (
           <CommonBtn
             text="Next"
             customBtnStyle={styles.confirmBtn}
-            onPress={onSubmitHandler}
+            onPress={onConfirmHandler}
           />
         )}
       </View>
-      {calenderShow && (
-        <DateTimePicker
-          testID="dateTimePicker"
-          value={date}
-          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-          mode={dateTime}
-          is24Hour={false}
-          onChange={onChange}
-          // style={styles.datePicker}
-        />
-      )}
-      <Provider>
-        <Portal>
-          <Modal visible={visible} onDismiss={hideModal} contentContainerStyle={styles.containerStyle}>
-            <View >
-              <Text>Pick-up time and date</Text>
-              <Text>Today, 12:36</Text>
-              <Button title='predd' onPress={showTime} />
-
-            </View>
-
-          </Modal>
-        </Portal>
-
-      </Provider>
+      <DateTimePickerModal
+        isVisible={isDatePickerVisible}
+        mode="datetime"
+        onConfirm={date => handleConfirm(date)}
+        onCancel={hideDatePicker}
+      />
     </View>
   );
 };
@@ -633,7 +637,5 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: '100%',
     height: h(60),
-
   },
-
 });

@@ -29,8 +29,10 @@ const LoginScreen = ({navigation}) => {
   const [visible, setVisible] = React.useState(false);
   const [value, setValue] = useState('');
   const [formattedValue, setFormattedValue] = useState('');
-  const [countryCode, setCountryCode] = useState('');
-  const phoneInput = useRef(null);
+  const [countryCode, setCountryCode] = useState('91');
+  const phoneInput = useRef("india");
+
+  console.log('phoneInput--->>>',phoneInput)
 
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
@@ -52,9 +54,10 @@ const LoginScreen = ({navigation}) => {
         );
         Geocoder.from(position.coords.latitude, position.coords.longitude)
           .then(async json => {
-            console.log('json---->>>', json);
+            console.log('json---->>>', json.results[0].address_components[6].long_name);
             const addressComponent = json.results[0].address_components;
-            const addresCurrent = addressComponent[1].long_name;
+            const addresCurrent = addressComponent
+            
           })
           .catch(error => console.log('error===>>', error));
       },
@@ -142,8 +145,7 @@ const LoginScreen = ({navigation}) => {
             alignSelf: 'center',
           }}
           textInputStyle={{
-            height: h(5),
-            marginTop: h(1),
+            height: h(7),
             marginLeft: w(-3),
             fontSize: fs(16),
           }}
